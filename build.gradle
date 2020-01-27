@@ -1,0 +1,10 @@
+dependencies {
+    compile (group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11') { exclude group: 'commons-logging', module: 'commons-logging' }
+    compile (group: 'commons-io', name: 'commons-io', version: '2.6') { exclude group: 'commons-logging', module: 'commons-logging' }
+
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'
+    compile group: 'org.eclipse.jetty', name: 'jetty-rewrite', version: '9.4.26.v20200117'
+
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+}

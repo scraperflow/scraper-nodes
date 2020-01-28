@@ -25,7 +25,6 @@ import scraper.core.AbstractNode;
 import scraper.core.Template;
 import scraper.util.NodeUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,10 +40,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -103,7 +101,7 @@ public final class SocketNode extends AbstractFunctionalNode {
     private Integer port;
 
     /** After the return of the forward call, the result object is expected at this key */
-    @FlowKey
+    @FlowKey @NotNull
     private final Template<String> expected = new Template<>(){};
 
     /** If expected is a file */
@@ -124,7 +122,7 @@ public final class SocketNode extends AbstractFunctionalNode {
     private Template<String> contentType = new Template<>(){};
 
     /** Additional GET-request parameters, if any, are saved as a parameter list at this key location */
-    @FlowKey
+    @FlowKey(defaultValue = "\"\"")
     private String putParamsPrefix;
 
     @FlowKey(defaultValue = "{}")
@@ -145,10 +143,6 @@ public final class SocketNode extends AbstractFunctionalNode {
     /** Limits requests to one at a time if true */
     @FlowKey(defaultValue = "false")
     private Boolean queue;
-
-    /** Ignores logging for specified requests */
-    @FlowKey(defaultValue = "[]")
-    private List<String> ignoreLogs;
 
     /** basic auth, name password pairs */
     @FlowKey(defaultValue = "{}")
@@ -188,11 +182,9 @@ public final class SocketNode extends AbstractFunctionalNode {
 
         parameters = URLEncodedUtils.parse(uri2.getQuery(), StandardCharsets.UTF_8);
 
-        if (putParamsPrefix == null) putParamsPrefix = "";
         for (NameValuePair parameter : parameters) {
             args.put(putParamsPrefix + parameter.getName(), parameter.getValue());
         }
-
 
         return decode(parameters.get(0).getValue(), StandardCharsets.UTF_8);
     }
@@ -203,14 +195,10 @@ public final class SocketNode extends AbstractFunctionalNode {
             final FlowMap args,
             final String param
     ) throws
-            IOException, ExecutionException, RequestMappingException, NodeException {
+            IOException, ExecutionException, RequestMappingException, NodeException, InterruptedException {
+        log(INFO,"Request for query '{}'", param);
 
-
-        if(!ignoreLogs.contains(param))
-            log(INFO,"Request for query '{}'", param);
-
-        if(put != null)
-            args.put(put, param);
+        if(put != null) args.put(put, param);
 
         // guard for multiple same requests
         boolean skip = false;
@@ -256,7 +244,7 @@ public final class SocketNode extends AbstractFunctionalNode {
 
     }
 
-    private void streamContent(HttpServletResponse response, FlowMap o) throws IOException, NodeException {
+    private void streamContent(HttpServletResponse response, FlowMap o) throws IOException {
         String filePath = getJobPojo().getFileService().getTemporaryDirectory()+File.separator+expected.eval(o);
         try (FileInputStream fs = new FileInputStream(filePath)) {
             IOUtils.copy(fs, response.getOutputStream());
@@ -270,7 +258,7 @@ public final class SocketNode extends AbstractFunctionalNode {
      // socket node is never interrupted while waiting for the future
     private Object createRequest(final String url, final FlowMap o)
             throws MalformedURLException, RequestMappingException,
-            ExecutionException, NodeException {
+            ExecutionException, NodeException, InterruptedException {
 
         Object process;
         if (hostMap != null) {
@@ -280,32 +268,21 @@ public final class SocketNode extends AbstractFunctionalNode {
             process = args.get(url);
             if(process == null) throw new RequestMappingException("Request mapping not defined: " + url);
         } else {
-            process = getStageIndex() + 1;
+            throw new NodeException("Neither a host mapping nor a request mapping is defined");
         }
-
 
         // submit request
-        Future<?> future = getService().submit((Callable<Void>) () -> {
-            log(TRACE,"Delegating request to process '{}'", process);
-            eval(o, NodeUtil.addressOf(String.valueOf(process)));
-            return null;
-        });
-
-        // wait for request to finish
-        try {
-            future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CompletableFuture<FlowMap> futureFlow = forkDepend(o, NodeUtil.addressOf(String.valueOf(process)));
+        FlowMap result = futureFlow.get();
 
         Object output = null;
-        if(!isFile && expected.eval(o) != null) output = o.get(expected.eval(o));
+        if(!isFile && expected.eval(result) != null) output = result.get(expected.eval(result));
         if(cache != null && cache && output != null) resultCache.put(url, output);
         return output;
     }
 
     @Override
-    public void modify(@NotNull FlowMap o) throws NodeException {
+    public void modify(@NotNull final FlowMap o) throws NodeException {
         //save map
         currentArgs = NodeUtil.flowOf(o);
 
@@ -399,7 +376,7 @@ public final class SocketNode extends AbstractFunctionalNode {
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             sync();
 
             FlowMap args = flowOf(node.currentArgs);
@@ -441,6 +418,10 @@ public final class SocketNode extends AbstractFunctionalNode {
                     node.log(INFO,"Request not encoded properly or not a valid host: "+req);
                     node.wrapException(response, e, "Request was not encoded correctly or host is not valid! %s", SC_BAD_REQUEST, e.getMessage());
                 }
+                catch (InterruptedException e) {
+                    node.log(WARN,"Request interrupted on server side: "+req);
+                    node.wrapException(response, e, "Request was interrupted on server side! %s", SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                }
                 catch (ExecutionException e) {
                     if(e.getCause() != null && e.getCause() instanceof NodeException) {
                         int code = 500;
@@ -450,17 +431,12 @@ public final class SocketNode extends AbstractFunctionalNode {
                         node.log(WARN,"{}; {}", message, fixMessage);
                         node.wrapException(response, e, "Error during request execution. %s: %s", code, message, fixMessage);
                     } else {
-//                        e.printStackTrace();
+                        e.printStackTrace();
                         node.log(ERROR,"Unexpected exception '"+e.getCause().getClass().getSimpleName()+"' thrown inside node processes!", e.getCause().getCause());
                         node.wrapException(response, e, "Error during request execution, unknown cause.",
                                 SC_INTERNAL_SERVER_ERROR, String.valueOf(e.getCause()));
                     }
                 }
-//                catch (ReservationException e) {
-//                    node.log(ERROR,"Could not put result into map, reserved field!");
-//                    node.wrapException(response, e, "Error during request execution, field was already reserved in map.",
-//                            SC_INTERNAL_SERVER_ERROR);
-//                }
                 catch (NodeException e) {
                     node.log(ERROR,"Failed argument template substitution!");
                     node.wrapException(response, e, "Severe scrape definition error.",

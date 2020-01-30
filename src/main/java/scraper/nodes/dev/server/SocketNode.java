@@ -20,6 +20,10 @@ import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
+import scraper.api.node.container.FunctionalNodeContainer;
+import scraper.api.node.container.NodeContainer;
+import scraper.api.node.type.FunctionalNode;
+import scraper.api.reflect.T;
 import scraper.core.AbstractFunctionalNode;
 import scraper.core.AbstractNode;
 import scraper.core.Template;
@@ -49,7 +53,7 @@ import java.util.stream.Collectors;
 import static java.net.URLDecoder.decode;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static scraper.core.NodeLogLevel.*;
+import static scraper.api.node.container.NodeLogLevel.*;
 import static scraper.util.NodeUtil.flowOf;
 
 /**
@@ -93,8 +97,8 @@ import static scraper.util.NodeUtil.flowOf;
  * @author Albert Schimpf
  * @author Marco Meides
  */
-@NodePlugin("0.5.1")
-public final class SocketNode extends AbstractFunctionalNode {
+@NodePlugin("0.6.0")
+public final class SocketNode implements FunctionalNode {
 
     /** Port of the server */
     @FlowKey(defaultValue = "8080") @Argument
@@ -102,7 +106,7 @@ public final class SocketNode extends AbstractFunctionalNode {
 
     /** After the return of the forward call, the result object is expected at this key */
     @FlowKey @NotNull
-    private final Template<String> expected = new Template<>(){};
+    private final T<String> expected = new T<>(){};
 
     /** If expected is a file */
     @FlowKey(defaultValue = "false") @Argument
@@ -119,14 +123,14 @@ public final class SocketNode extends AbstractFunctionalNode {
 
     /** Content type if result is a file */
     @FlowKey(defaultValue = "\"text/plain\"")
-    private Template<String> contentType = new Template<>(){};
+    private T<String> contentType = new T<>(){};
 
     /** Additional GET-request parameters, if any, are saved as a parameter list at this key location */
     @FlowKey(defaultValue = "\"\"")
     private String putParamsPrefix;
 
     @FlowKey(defaultValue = "{}")
-    private final Template<Map<String, String>> responseHeaders = new Template<>(){};
+    private final T<Map<String, String>> responseHeaders = new T<>(){};
 
     /** Caches {@link #expected} for same requests. Should not be used together with zip output. */
     @FlowKey(defaultValue = "false")
@@ -146,14 +150,14 @@ public final class SocketNode extends AbstractFunctionalNode {
 
     /** basic auth, name password pairs */
     @FlowKey(defaultValue = "{}")
-    private Template<Map<String, String>> basicAuth = new Template<>(){};
+    private T<Map<String, String>> basicAuth = new T<>(){};
 
     // caching
     private final Map<String, Object> resultCache = new ConcurrentHashMap<>();
     // manage concurrent requests
     private final List<String> ongoingRequests = Collections.synchronizedList(new ArrayList<>());
     // mapper to generate JSON exception responses
-    private final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private FlowMap currentArgs;
     private AtomicBoolean started = new AtomicBoolean(false);
@@ -191,12 +195,13 @@ public final class SocketNode extends AbstractFunctionalNode {
 
 
     private void handleInternal(
+            final NodeContainer n,
             final HttpServletResponse response,
             final FlowMap args,
             final String param
     ) throws
             IOException, ExecutionException, RequestMappingException, NodeException, InterruptedException {
-        log(INFO,"Request for query '{}'", param);
+        n.log(INFO,"Request for query '{}'", param);
 
         if(put != null) args.put(put, param);
 
@@ -229,34 +234,34 @@ public final class SocketNode extends AbstractFunctionalNode {
 
         Object resultString = resultCache.get(param);
         if(resultString == null) {
-            resultString = createRequest(param, args);
+            resultString = createRequest(n, param, args);
         }
         response.setStatus(HttpServletResponse.SC_OK);
 
-        responseHeaders.eval(args).forEach(response::setHeader);
-        response.setContentType(contentType.eval(args));
+        args.eval(responseHeaders).forEach(response::setHeader);
+        response.setContentType(args.eval(contentType));
 
         if(!isFile) {
             response.getWriter().print(((resultString == null ? "null" : resultString.toString())));
         } else {
-            streamContent(response, args);
+            streamContent(n, response, args);
         }
 
     }
 
-    private void streamContent(HttpServletResponse response, FlowMap o) throws IOException {
-        String filePath = getJobPojo().getFileService().getTemporaryDirectory()+File.separator+expected.eval(o);
+    private void streamContent(NodeContainer n, HttpServletResponse response, FlowMap o) throws IOException {
+        String filePath = n.getJobInstance().getFileService().getTemporaryDirectory()+File.separator+o.eval(expected);
         try (FileInputStream fs = new FileInputStream(filePath)) {
             IOUtils.copy(fs, response.getOutputStream());
         }
         if(!new File(filePath).delete()) {
-            log(WARN,"Could not delete streamed zip file: {}", filePath);
+            n.log(WARN,"Could not delete streamed zip file: {}", filePath);
         }
     }
 
 
      // socket node is never interrupted while waiting for the future
-    private Object createRequest(final String url, final FlowMap o)
+    private Object createRequest(NodeContainer<?> n, final String url, final FlowMap o)
             throws MalformedURLException, RequestMappingException,
             ExecutionException, NodeException, InterruptedException {
 
@@ -272,28 +277,27 @@ public final class SocketNode extends AbstractFunctionalNode {
         }
 
         // submit request
-        CompletableFuture<FlowMap> futureFlow = forkDepend(o, NodeUtil.addressOf(String.valueOf(process)));
+        CompletableFuture<FlowMap> futureFlow = n.forkDepend(o, NodeUtil.addressOf(String.valueOf(process)));
         FlowMap result = futureFlow.get();
 
         Object output = null;
-        if(!isFile && expected.eval(result) != null) output = result.get(expected.eval(result));
+        if(!isFile && result.eval(expected) != null) output = result.get(result.eval(expected));
         if(cache != null && cache && output != null) resultCache.put(url, output);
         return output;
     }
 
-    @Override
-    public void modify(@NotNull final FlowMap o) throws NodeException {
+    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
         //save map
         currentArgs = NodeUtil.flowOf(o);
 
         if(!started.getAndSet(true)) {
-            log(DEBUG,"Starting socket server...");
-            startServer(port, o);
-            log(INFO,"Started socket server on port {}", port);
+            n.log(DEBUG,"Starting socket server...");
+            startServer(n, port, o);
+            n.log(INFO,"Started socket server on port {}", port);
         }
     }
 
-    private void startServer(Integer port, FlowMap o) throws NodeException {
+    private void startServer(NodeContainer n, Integer port, FlowMap o) throws NodeException {
         Server server = new Server();
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);
@@ -306,9 +310,9 @@ public final class SocketNode extends AbstractFunctionalNode {
         server.addConnector(http);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.addServlet(new ServletHolder(new SocketHandler(this)),"/*");
+        context.addServlet(new ServletHolder(new SocketHandler(n, this)),"/*");
 
-        if(!basicAuth.eval(o).isEmpty())
+        if(!o.eval(basicAuth).isEmpty())
             context.setSecurityHandler(basicAuth(o));
 
         context.setContextPath("/");
@@ -320,12 +324,12 @@ public final class SocketNode extends AbstractFunctionalNode {
             server.start();
 //            server.join();
         } catch (Exception e) {
-            log(ERROR,"Jetty server failed to start: {}", e.getMessage());
+            n.log(ERROR,"Jetty server failed to start: {}", e.getMessage());
             throw new NodeException(e,"Fix server implementation");
         }
     }
 
-    private void wrapException(HttpServletResponse response, Exception e, String message, int status, String... args) throws IOException {
+    static void wrapException(HttpServletResponse response, Exception e, String message, int status, String... args) throws IOException {
         ObjectNode node = mapper.createObjectNode();
 
         if(e != null) {
@@ -341,6 +345,7 @@ public final class SocketNode extends AbstractFunctionalNode {
     }
 
 
+
     static class RequestMappingException extends Exception {
         RequestMappingException (String s) {
             super(s);
@@ -349,6 +354,7 @@ public final class SocketNode extends AbstractFunctionalNode {
 
 
     static class SocketHandler extends HttpServlet {
+        private final NodeContainer<?> nodeC;
         private final SocketNode node;
         private final Boolean queue;
         private final String putBody;
@@ -357,8 +363,9 @@ public final class SocketNode extends AbstractFunctionalNode {
 
 
 
-        SocketHandler(SocketNode socketNode) {
-            this.node = socketNode;
+        SocketHandler(NodeContainer<?> container, SocketNode node) {
+            this.nodeC = container;
+            this.node = node;
             this.queue = node.queue;
             this.putBody = node.putBody;
         }
@@ -404,23 +411,19 @@ public final class SocketNode extends AbstractFunctionalNode {
                 if(req == null) return;
 
                 try {
-                    node.start(args);
-
-                    node.handleInternal(response, args, req);
-
-                    node.finish(args);
+                    node.handleInternal(nodeC, response, args, req);
                 }
                 catch (RequestMappingException e) {
-                    node.log(WARN, "Received unknown request!", e.getMessage());
-                    node.wrapException(response, e, "Bad request: %s", SC_BAD_REQUEST, e.getMessage());
+                    nodeC.log(WARN, "Received unknown request!", e.getMessage());
+                    wrapException(response, e, "Bad request: %s", SC_BAD_REQUEST, e.getMessage());
                 }
                 catch (MalformedURLException e) {
-                    node.log(INFO,"Request not encoded properly or not a valid host: "+req);
-                    node.wrapException(response, e, "Request was not encoded correctly or host is not valid! %s", SC_BAD_REQUEST, e.getMessage());
+                    nodeC.log(INFO,"Request not encoded properly or not a valid host: "+req);
+                    wrapException(response, e, "Request was not encoded correctly or host is not valid! %s", SC_BAD_REQUEST, e.getMessage());
                 }
                 catch (InterruptedException e) {
-                    node.log(WARN,"Request interrupted on server side: "+req);
-                    node.wrapException(response, e, "Request was interrupted on server side! %s", SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    nodeC.log(WARN,"Request interrupted on server side: "+req);
+                    wrapException(response, e, "Request was interrupted on server side! %s", SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
                 catch (ExecutionException e) {
                     if(e.getCause() != null && e.getCause() instanceof NodeException) {
@@ -428,18 +431,18 @@ public final class SocketNode extends AbstractFunctionalNode {
                         String message = e.getCause().getMessage();
                         String fixMessage = e.getMessage();
 
-                        node.log(WARN,"{}; {}", message, fixMessage);
-                        node.wrapException(response, e, "Error during request execution. %s: %s", code, message, fixMessage);
+                        nodeC.log(WARN,"{}; {}", message, fixMessage);
+                        wrapException(response, e, "Error during request execution. %s: %s", code, message, fixMessage);
                     } else {
                         e.printStackTrace();
-                        node.log(ERROR,"Unexpected exception '"+e.getCause().getClass().getSimpleName()+"' thrown inside node processes!", e.getCause().getCause());
-                        node.wrapException(response, e, "Error during request execution, unknown cause.",
+                        nodeC.log(ERROR,"Unexpected exception '"+e.getCause().getClass().getSimpleName()+"' thrown inside node processes!", e.getCause().getCause());
+                        wrapException(response, e, "Error during request execution, unknown cause.",
                                 SC_INTERNAL_SERVER_ERROR, String.valueOf(e.getCause()));
                     }
                 }
                 catch (NodeException e) {
-                    node.log(ERROR,"Failed argument template substitution!");
-                    node.wrapException(response, e, "Severe scrape definition error.",
+                    nodeC.log(ERROR,"Failed argument template substitution!");
+                    wrapException(response, e, "Severe scrape definition error.",
                             SC_INTERNAL_SERVER_ERROR);
                 } finally {
                     synchronized (node.ongoingRequests) {
@@ -449,8 +452,8 @@ public final class SocketNode extends AbstractFunctionalNode {
 
             }
             catch (URISyntaxException e) {
-                node.log(ERROR,"Failed reservation or not an URI!");
-                node.wrapException(response, e, "Severe scrape definition error.", SC_INTERNAL_SERVER_ERROR);
+                nodeC.log(ERROR,"Failed reservation or not an URI!");
+                wrapException(response, e, "Severe scrape definition error.", SC_INTERNAL_SERVER_ERROR);
             }
             finally {
                 if(queue) synchronized (waitingForFinish) {
@@ -465,7 +468,7 @@ public final class SocketNode extends AbstractFunctionalNode {
         HashLoginService l = new HashLoginService();
         UserStore store = new UserStore();
 
-        basicAuth.eval(o).forEach((username, password) ->
+        o.eval(basicAuth).forEach((username, password) ->
                 store.addUser(username, Credential.getCredential(password), new String[]{"user"})
         );
 

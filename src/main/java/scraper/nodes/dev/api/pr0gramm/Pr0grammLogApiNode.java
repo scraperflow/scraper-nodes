@@ -1,12 +1,13 @@
 package scraper.nodes.dev.api.pr0gramm;
 
-import scraper.annotations.NotNull;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
+import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
-import scraper.core.AbstractFunctionalNode;
-import scraper.core.NodeLogLevel;
-import scraper.core.Template;
+import scraper.api.node.container.FunctionalNodeContainer;
+import scraper.api.node.container.NodeLogLevel;
+import scraper.api.node.type.FunctionalNode;
+import scraper.api.reflect.T;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,51 +19,51 @@ import java.util.List;
  * Converts an encoded log string to personal metadata
  */
 @NodePlugin("0.1.0")
-public class Pr0grammLogApiNode extends AbstractFunctionalNode {
+public class Pr0grammLogApiNode implements FunctionalNode {
     /** Encoded log string */
     @FlowKey(defaultValue = "\"{log}\"")
-    private final Template<String> logString = new Template<>(){};
+    private final T<String> logString = new T<>(){};
 
     /** Item favorites are saved here in a ID list if specified */
     @FlowKey(output = true)
-    private final Template<List<Long>> itemFavorites = new Template<>(){};
+    private final T<List<Long>> itemFavorites = new T<>(){};
 
     /** Comment favorites are saved here in a ID list if specified */
     @FlowKey(output = true)
-    private final Template<List<Long>> commentFavorites = new Template<>(){};
+    private final T<List<Long>> commentFavorites = new T<>(){};
 
 
     /** Item likes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> itemLikes = new Template<>(){};
+    private final T<List<Long>> itemLikes = new T<>(){};
 
     /** Comment likes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> commentLikes = new Template<>(){};
+    private final T<List<Long>> commentLikes = new T<>(){};
 
     /** Tag likes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> tagLikes = new Template<>(){};
+    private final T<List<Long>> tagLikes = new T<>(){};
 
 
     /** Item dislikes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> itemDislikes = new Template<>(){};
+    private final T<List<Long>> itemDislikes = new T<>(){};
 
     /** Comment dislikes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> commentDislikes = new Template<>(){};
+    private final T<List<Long>> commentDislikes = new T<>(){};
 
     /** Tag dislikes are saved here in a ID list */
     @FlowKey(output = true)
-    private final Template<List<Long>> tagDislikes = new Template<>(){};
+    private final T<List<Long>> tagDislikes = new T<>(){};
 
     /** Used to decode Base64 content */
     private final Base64.Decoder base64 = Base64.getDecoder();
 
     @Override
-    public void modify(@NotNull final FlowMap o) {
-        String encodedMessage = logString.eval(o);
+    public void modify(FunctionalNodeContainer n, FlowMap o) {
+        String encodedMessage = o.eval(logString);
 
         // Decode Base64
         ByteBuffer byteData = ByteBuffer.wrap(base64.decode(encodedMessage));
@@ -103,7 +104,7 @@ public class Pr0grammLogApiNode extends AbstractFunctionalNode {
                 case 7: tDislikes.add(id); break;
                 case 9: tLikes.add(id); break;
                 default:
-                    log(NodeLogLevel.WARN, "Unknown action: {}. Has the API changed?", action);
+                    n.log(NodeLogLevel.WARN, "Unknown action: {}. Has the API changed?", action);
             }
         }
 
@@ -119,8 +120,9 @@ public class Pr0grammLogApiNode extends AbstractFunctionalNode {
         insertIfNotNull(tagDislikes, tDislikes, o);
     }
 
-    private void insertIfNotNull(Template<List<Long>> key, List<Long> result, FlowMap o) {
-        List<Long> outt = key.eval(o);
-        if(outt != null) key.output(o, result);
+    private void insertIfNotNull(T<List<Long>> key, List<Long> result, FlowMap o) {
+        List<Long> outt = o.eval(key);
+        if(outt != null) o.output(key, result);
     }
+
 }

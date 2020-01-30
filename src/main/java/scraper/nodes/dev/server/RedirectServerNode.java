@@ -5,18 +5,21 @@ import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.rewrite.handler.RewriteRegexRule;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import scraper.annotations.NotNull;
 import scraper.annotations.node.Argument;
-import scraper.annotations.node.FlowKey; import scraper.annotations.node.NodePlugin;
+import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
-import scraper.core.AbstractFunctionalNode;
+import scraper.api.node.container.FunctionalNodeContainer;
+import scraper.api.node.container.NodeContainer;
+import scraper.api.node.type.FunctionalNode;
 import scraper.core.AbstractNode;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static scraper.core.NodeLogLevel.*;
+import static scraper.api.node.container.NodeLogLevel.*;
+
 
 /**
  * Redirects urls to other urls.
@@ -26,7 +29,7 @@ import static scraper.core.NodeLogLevel.*;
  * @author Albert Schimpf
  */
 @NodePlugin("0.1.0")
-public final class RedirectServerNode extends AbstractFunctionalNode {
+public final class RedirectServerNode implements FunctionalNode {
 
     /** Port of the server */
     @FlowKey(defaultValue = "8081") @Argument
@@ -49,15 +52,15 @@ public final class RedirectServerNode extends AbstractFunctionalNode {
     private AtomicBoolean started = new AtomicBoolean(false);
 
     @Override
-    public void modify(@NotNull final FlowMap o) throws NodeException {
+    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
         if(!started.getAndSet(true)) {
-            log(DEBUG,"Starting redirect server...");
-            startServer(port);
-            log(INFO,"Started redirect server on port {}", port);
+            n.log(DEBUG,"Starting redirect server...");
+            startServer(n, port);
+            n.log(INFO,"Started redirect server on port {}", port);
         }
     }
 
-    private void startServer(Integer port) throws NodeException {
+    private void startServer(NodeContainer n, Integer port) throws NodeException {
         Server server = new Server();
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);
@@ -94,8 +97,9 @@ public final class RedirectServerNode extends AbstractFunctionalNode {
             server.start();
 //            server.join();
         } catch (Exception e) {
-            log(ERROR,"Jetty server failed to start: {}", e.getMessage());
+            n.log(ERROR,"Jetty server failed to start: {}", e.getMessage());
             throw new NodeException(e,"Fix server implementation");
         }
     }
+
 }

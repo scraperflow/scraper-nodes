@@ -6,8 +6,9 @@ import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
-import scraper.core.AbstractNode;
-import scraper.core.Template;
+import scraper.api.node.container.FunctionalNodeContainer;
+import scraper.api.node.type.FunctionalNode;
+import scraper.api.reflect.T;
 
 import java.io.IOException;
 
@@ -17,33 +18,31 @@ import java.io.IOException;
  * @author Albert Schimpf
  */
 @NodePlugin("1.0.0")
-public final class PersistentDuplicateCheckNode extends AbstractNode {
+public final class PersistentDuplicateCheckNode implements FunctionalNode {
 
     /** file path */
     @FlowKey(mandatory = true) @EnsureFile
     private String persistentStore;
 
     @FlowKey(defaultValue = "\"{content}\"")
-    private Template<String> content = new Template<>(){};
+    private T<String> content = new T<>(){};
 
     @FlowKey(defaultValue = "\"exists\"", output = true) @NotNull
-    private final Template<Boolean> result = new Template<>(){};
+    private final T<Boolean> result = new T<>(){};
 
-    @Override @NotNull
-    public FlowMap process(@NotNull final FlowMap o) throws NodeException {
-        String line = content.eval(o);
+    @Override
+    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
+        String line = o.eval(content);
         try {
-            String check = getJobPojo().getFileService().getFirstLineStartsWith(persistentStore, line);
+            String check = n.getJobInstance().getFileService().getFirstLineStartsWith(persistentStore, line);
 
             if(check == null) {
-                result.output(o, false);
+                o.output(result, false);
             } else {
-                result.output(o, true);
+                o.output(result, true);
             }
         } catch (IOException e) {
             throw new NodeException(e, "Could not access IO");
         }
-
-        return forward(o);
     }
 }

@@ -1,4 +1,4 @@
-import scraper.api.node.Node;
+import scraper.api.node.type.Node;
 import scraper.nodes.dev.server.SocketNode;
 
 open module scraper.nodes.dev {

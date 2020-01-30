@@ -20,6 +20,7 @@ import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
+import scraper.api.node.Address;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
@@ -138,11 +139,11 @@ public final class SocketNode implements FunctionalNode {
 
     /** hostname to target label mapping, if any */
     @FlowKey
-    private Map<String, String> hostMap;
+    private Map<String, Address> hostMap;
 
     /** Literal request to target label mapping, if any */
     @FlowKey
-    private Map<String, String> args;
+    private Map<String, Address> args;
 
     /** Limits requests to one at a time if true */
     @FlowKey(defaultValue = "false")
@@ -265,7 +266,7 @@ public final class SocketNode implements FunctionalNode {
             throws MalformedURLException, RequestMappingException,
             ExecutionException, NodeException, InterruptedException {
 
-        Object process;
+        Address process;
         if (hostMap != null) {
             process = hostMap.get(new URL(url).getHost());
             if(process == null) throw new RequestMappingException("Host mapping not defined: " + url);
@@ -277,7 +278,8 @@ public final class SocketNode implements FunctionalNode {
         }
 
         // submit request
-        CompletableFuture<FlowMap> futureFlow = n.forkDepend(o, NodeUtil.addressOf(String.valueOf(process)));
+
+        CompletableFuture<FlowMap> futureFlow = n.forkDepend(o, process);
         FlowMap result = futureFlow.get();
 
         Object output = null;

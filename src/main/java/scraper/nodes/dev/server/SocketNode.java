@@ -134,11 +134,11 @@ public final class SocketNode implements FunctionalNode {
 
     /** hostname to target label mapping, if any */
     @FlowKey
-    private Map<String, Address> hostMap;
+    private T<Map<String, Address>> hostMap;
 
     /** Literal request to target label mapping, if any */
     @FlowKey
-    private Map<String, Address> args;
+    private T<Map<String, Address>> args;
 
     /** Limits requests to one at a time if true */
     @FlowKey(defaultValue = "false")
@@ -260,13 +260,15 @@ public final class SocketNode implements FunctionalNode {
     private Object createRequest(NodeContainer<?> n, final String url, final FlowMap o)
             throws MalformedURLException, RequestMappingException,
             ExecutionException, NodeException, InterruptedException {
+        Optional<Map<String, Address>> hostMap = o.evalIdentityMaybe(this.hostMap);
+        Optional<Map<String, Address>> args = o.evalIdentityMaybe(this.args);
 
         Address process;
-        if (hostMap != null) {
-            process = hostMap.get(new URL(url).getHost());
+        if (hostMap.isPresent()) {
+            process = hostMap.get().get(new URL(url).getHost());
             if(process == null) throw new RequestMappingException("Host mapping not defined: " + url);
-        } else if (args != null){
-            process = args.get(url);
+        } else if (args.isPresent()){
+            process = args.get().get(url);
             if(process == null) throw new RequestMappingException("Request mapping not defined: " + url);
         } else {
             throw new NodeException("Neither a host mapping nor a request mapping is defined");

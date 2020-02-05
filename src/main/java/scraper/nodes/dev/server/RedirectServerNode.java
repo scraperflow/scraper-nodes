@@ -14,6 +14,7 @@ import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
+import scraper.api.reflect.T;
 import scraper.core.AbstractNode;
 
 import java.util.Map;
@@ -41,14 +42,14 @@ public final class RedirectServerNode implements FunctionalNode {
      *   "/reverse/([^/]*)/(.*)" -> "/reverse/$2/$1"
      */
     @FlowKey(defaultValue = "{}")
-    private Map<String, String> regexRedirect;
+    private T<Map<String, String>> regexRedirect = new T<>(){};
 
     /**
      * Pattern to url mapping, e.g
      *   "/reverse/*" -> "http://redirected.org"
      */
     @FlowKey(defaultValue = "{}")
-    private Map<String, String> patternRedirect;
+    private T<Map<String, String>> patternRedirect = new T<>(){};
 
     private AtomicBoolean started = new AtomicBoolean(false);
 
@@ -56,12 +57,15 @@ public final class RedirectServerNode implements FunctionalNode {
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         if(!started.getAndSet(true)) {
             n.log(DEBUG,"Starting redirect server...");
-            startServer(n, port);
+            startServer(n, port, o);
             n.log(INFO,"Started redirect server on port {}", port);
         }
     }
 
-    private void startServer(NodeContainer n, Integer port) throws NodeException {
+    private void startServer(NodeContainer n, Integer port, FlowMap o) throws NodeException {
+        Map<String, String> regexRedirect = o.eval(this.regexRedirect);
+        Map<String, String> patternRedirect = o.eval(this.patternRedirect);
+
         Server server = new Server();
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);

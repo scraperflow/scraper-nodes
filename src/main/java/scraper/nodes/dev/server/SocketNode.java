@@ -134,11 +134,11 @@ public final class SocketNode implements FunctionalNode {
 
     /** hostname to target label mapping, if any */
     @FlowKey
-    private T<Map<String, Address>> hostMap;
+    private T<Map<String, Address>> hostMap = new T<>(){};
 
     /** Literal request to target label mapping, if any */
     @FlowKey
-    private T<Map<String, Address>> args;
+    private T<Map<String, Address>> args = new T<>(){};
 
     /** Limits requests to one at a time if true */
     @FlowKey(defaultValue = "false")

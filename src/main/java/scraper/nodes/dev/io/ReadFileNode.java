@@ -33,7 +33,7 @@ public final class ReadFileNode implements FunctionalNode {
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
 
-    public void modify(@NotNull FunctionalNodeContainer n, FlowMap o) throws NodeException {
+    public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
 
         try (Stream<String> stream = Files.lines(Paths.get(file), Charset.forName(charset))) {

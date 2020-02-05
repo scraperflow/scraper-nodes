@@ -25,9 +25,7 @@ import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.reflect.T;
-import scraper.core.AbstractFunctionalNode;
 import scraper.core.AbstractNode;
-import scraper.core.Template;
 import scraper.util.NodeUtil;
 
 import javax.servlet.http.HttpServlet;
@@ -41,10 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -281,14 +276,15 @@ public final class SocketNode implements FunctionalNode {
 
         CompletableFuture<FlowMap> futureFlow = n.forkDepend(o, process);
         FlowMap result = futureFlow.get();
+        Optional<String> resultMaybe = result.evalMaybe(expected);
 
         Object output = null;
-        if(!isFile && result.eval(expected) != null) output = result.get(result.eval(expected));
+        if(!isFile && resultMaybe.isPresent()) output = result.get(result.eval(expected));
         if(cache != null && cache && output != null) resultCache.put(url, output);
         return output;
     }
 
-    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
+    public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         //save map
         currentArgs = NodeUtil.flowOf(o);
 

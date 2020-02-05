@@ -1,5 +1,6 @@
 package scraper.nodes.dev.io;
 
+import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
@@ -38,7 +39,7 @@ public final class ReadChunkFileNode implements StreamNode {
     private Integer split;
 
     @Override
-    public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
         n.collect(o, List.of(output.getRawJson()));
 
@@ -53,7 +54,7 @@ public final class ReadChunkFileNode implements StreamNode {
                     if (current > split) {
                         FlowMap out = NodeUtil.flowOf(o);
                         out.output(output, splitContent.toString());
-                        n.stream(o, out);
+                        n.streamFlowMap(o, out);
                         splitContent = new StringBuilder();
                         current = 0;
                     }
@@ -70,7 +71,7 @@ public final class ReadChunkFileNode implements StreamNode {
             if (splitContent.length() > 0) {
                 FlowMap out = NodeUtil.flowOf(o);
                 out.output(output, splitContent.toString());
-                n.stream(o, out);
+                n.streamFlowMap(o, out);
             }
         } catch (IOException e) {
             e.printStackTrace();

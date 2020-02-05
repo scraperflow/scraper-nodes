@@ -31,7 +31,7 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
     private final T<Boolean> result = new T<>(){};
 
     @Override
-    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
+    public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String line = o.eval(content);
         try {
             String check = n.getJobInstance().getFileService().getFirstLineStartsWith(persistentStore, line);

@@ -40,7 +40,7 @@ public class Pr0grammLoginNode implements Node {
     private final T<String> password = new T<>(){};
 
     @Override @NotNull
-    public FlowMap process(NodeContainer<? extends Node> n, FlowMap o) throws NodeException {
+    public FlowMap process(@NotNull NodeContainer<? extends Node> n, @NotNull FlowMap o) throws NodeException {
         HttpRequest request = buildLoginRequest(o);
 
         ReservationToken token;

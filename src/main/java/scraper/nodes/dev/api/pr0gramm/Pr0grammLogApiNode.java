@@ -1,8 +1,8 @@
 package scraper.nodes.dev.api.pr0gramm;
 
+import scraper.annotations.NotNull;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeLogLevel;
@@ -62,7 +62,7 @@ public class Pr0grammLogApiNode implements FunctionalNode {
     private final Base64.Decoder base64 = Base64.getDecoder();
 
     @Override
-    public void modify(FunctionalNodeContainer n, FlowMap o) {
+    public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) {
         String encodedMessage = o.eval(logString);
 
         // Decode Base64

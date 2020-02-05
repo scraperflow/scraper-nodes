@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import scraper.annotations.NotNull;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
@@ -41,7 +42,7 @@ public final class HtmlCssQueryNode implements StreamNode {
     private Boolean textOnly;
 
     @Override
-    public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         n.collect(o, List.of(put));
 
         // get html data at location
@@ -53,7 +54,7 @@ public final class HtmlCssQueryNode implements StreamNode {
             FlowMap copy = NodeUtil.flowOf(o);
             copy.put(put, textOnly ? element.text() : element.html());
 
-            n.stream(o, copy);
+            n.streamFlowMap(o, copy);
 
             if(onlyFirst) break;
         }

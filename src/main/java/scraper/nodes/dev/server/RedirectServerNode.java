@@ -5,6 +5,7 @@ import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.rewrite.handler.RewriteRegexRule;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import scraper.annotations.NotNull;
 import scraper.annotations.node.Argument;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
@@ -52,7 +53,7 @@ public final class RedirectServerNode implements FunctionalNode {
     private AtomicBoolean started = new AtomicBoolean(false);
 
     @Override
-    public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {
+    public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         if(!started.getAndSet(true)) {
             n.log(DEBUG,"Starting redirect server...");
             startServer(n, port);

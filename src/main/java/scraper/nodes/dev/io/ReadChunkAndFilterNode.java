@@ -1,6 +1,5 @@
 package scraper.nodes.dev.io;
 
-import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  */
 @NodePlugin("1.0.0")
-public final class ReadChunkFileNode implements StreamNode {
+public final class ReadChunkAndFilterNode implements StreamNode {
 
     /** Input file path */
     @FlowKey(mandatory = true) @EnsureFile
@@ -33,44 +32,53 @@ public final class ReadChunkFileNode implements StreamNode {
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
 
+    @FlowKey
+    private String filter;
 
-    @FlowKey(defaultValue = "1000")
-    private Integer splitAfterLines;
+    @FlowKey
+    private Integer includeAfterMatch;
 
     @Override
-    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
+    public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
         n.collect(o, List.of(output.getRawJson()));
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
-            StringBuilder splitContent = new StringBuilder();
 
-            int current = 1;
+            int current = -1;
+            StringBuilder builder = new StringBuilder();
 
             String line = reader.readLine();
 
             while (line != null) {
-                splitContent.append(line).append("\n");
-                if (current > splitAfterLines) {
-                    FlowMap out = NodeUtil.flowOf(o);
-                    out.output(output, splitContent.toString());
-                    n.streamFlowMap(o, out);
-                    splitContent = new StringBuilder();
-                    current = 0;
+//                if(!line.contains(filter) && current == -1) {
+//                    // does not contain filter
+//                    // no include after match, skip
+                if(line.contains(filter)) {
+                    // contains filter, possibly resets builder
+                    builder = new StringBuilder();
+                    current = includeAfterMatch;
+                    builder.append(line).append("\n");
+                } else if(current >= 0) {
+                    // no match, but leftover to add
+                    builder.append(line).append("\n");
+                    current--;
+
+                    // finished
+                    if(current == 0) {
+                        current--;
+
+                        FlowMap out = NodeUtil.flowOf(o);
+                        out.output(output, builder.toString());
+                        n.stream(o, out);
+                    }
                 }
 
                 line = reader.readLine();
 
-                current++;
-            }
-
-            if (splitContent.length() > 0) {
-                FlowMap out = NodeUtil.flowOf(o);
-                out.output(output, splitContent.toString());
-                n.streamFlowMap(o, out);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new NodeException(e, "Failed: " + e.getMessage());
         }
     }
 }

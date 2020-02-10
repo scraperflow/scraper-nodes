@@ -31,6 +31,6 @@ public final class StopOnEmptyListNode implements Node {
 
         if(check.isEmpty()) return o;
 
-        return n.forward(o);
+        return o;
     }
 }

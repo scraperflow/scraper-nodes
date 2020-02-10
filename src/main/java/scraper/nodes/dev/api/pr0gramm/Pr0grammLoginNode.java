@@ -74,7 +74,7 @@ public class Pr0grammLoginNode implements Node {
             token.close();
         }
 
-        return n.forward(o);
+        return o;
     }
 
     private HttpRequest buildLoginRequest(FlowMap o) throws NodeException {

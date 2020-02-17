@@ -27,7 +27,6 @@ import static scraper.api.node.container.NodeLogLevel.*;
  * Redirects urls to other urls.
  *
  * @see AbstractNode
- * @since 0.1
  * @author Albert Schimpf
  */
 @NodePlugin("0.1.0")

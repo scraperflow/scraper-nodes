@@ -17,7 +17,7 @@ import java.io.IOException;
  *
  * @author Albert Schimpf
  */
-@NodePlugin("1.0.0")
+@NodePlugin("0.1.0")
 public final class PersistentDuplicateCheckNode implements FunctionalNode {
 
     /** file path */

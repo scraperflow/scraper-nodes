@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  */
-@NodePlugin("1.0.0")
+@NodePlugin("0.1.0")
 public final class HtmlCssQueryNode implements StreamNode {
 
     /** Expect a raw html string at key defined by 'html' */

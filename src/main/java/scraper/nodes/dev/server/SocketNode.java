@@ -89,7 +89,6 @@ import static scraper.util.NodeUtil.flowOf;
  *</p>
  *
  * @see AbstractNode
- * @since 0.1
  * @author Albert Schimpf
  * @author Marco Meides
  */

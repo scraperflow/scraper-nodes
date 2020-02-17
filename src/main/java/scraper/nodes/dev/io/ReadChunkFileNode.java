@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  */
-@NodePlugin("1.0.0")
+@NodePlugin("0.1.0")
 public final class ReadChunkFileNode implements StreamNode {
 
     /** Input file path */

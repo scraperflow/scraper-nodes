@@ -24,6 +24,7 @@ import scraper.api.node.Address;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
+import scraper.api.node.type.Node;
 import scraper.api.reflect.T;
 import scraper.core.AbstractNode;
 import scraper.util.NodeUtil;
@@ -190,7 +191,7 @@ public final class SocketNode implements FunctionalNode {
 
 
     private void handleInternal(
-            final NodeContainer n,
+            final NodeContainer<? extends Node> n,
             final HttpServletResponse response,
             final FlowMap args,
             final String param
@@ -244,7 +245,7 @@ public final class SocketNode implements FunctionalNode {
 
     }
 
-    private void streamContent(NodeContainer n, HttpServletResponse response, FlowMap o) throws IOException {
+    private void streamContent(NodeContainer<? extends Node> n, HttpServletResponse response, FlowMap o) throws IOException {
         String filePath = n.getJobInstance().getFileService().getTemporaryDirectory()+File.separator+o.eval(expected);
         try (FileInputStream fs = new FileInputStream(filePath)) {
             IOUtils.copy(fs, response.getOutputStream());
@@ -296,7 +297,7 @@ public final class SocketNode implements FunctionalNode {
         }
     }
 
-    private void startServer(NodeContainer n, Integer port, FlowMap o) throws NodeException {
+    private void startServer(NodeContainer<? extends Node> n, Integer port, FlowMap o) throws NodeException {
         Server server = new Server();
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);
@@ -336,6 +337,7 @@ public final class SocketNode implements FunctionalNode {
             node.put("message", String.valueOf(e.getMessage()));
         }
 
+        //noinspection RedundantCast
         node.put("description", String.format(message, (Object[]) args));
 
         response.setStatus(status);
@@ -353,7 +355,7 @@ public final class SocketNode implements FunctionalNode {
 
 
     static class SocketHandler extends HttpServlet {
-        private final NodeContainer<?> nodeC;
+        private final NodeContainer<? extends Node> nodeC;
         private final SocketNode node;
         private final Boolean queue;
         private final String putBody;
@@ -362,7 +364,7 @@ public final class SocketNode implements FunctionalNode {
 
 
 
-        SocketHandler(NodeContainer<?> container, SocketNode node) {
+        SocketHandler(NodeContainer<? extends Node> container, SocketNode node) {
             this.nodeC = container;
             this.node = node;
             this.queue = node.queue;

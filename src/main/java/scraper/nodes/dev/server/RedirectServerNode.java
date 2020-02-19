@@ -14,6 +14,7 @@ import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
+import scraper.api.node.type.Node;
 import scraper.api.reflect.T;
 import scraper.core.AbstractNode;
 
@@ -61,7 +62,7 @@ public final class RedirectServerNode implements FunctionalNode {
         }
     }
 
-    private void startServer(NodeContainer n, Integer port, FlowMap o) throws NodeException {
+    private void startServer(NodeContainer<? extends Node> n, Integer port, FlowMap o) throws NodeException {
         Map<String, String> regexRedirect = o.eval(this.regexRedirect);
         Map<String, String> patternRedirect = o.eval(this.patternRedirect);
 

@@ -51,7 +51,7 @@ import static java.net.URLDecoder.decode;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static scraper.api.node.container.NodeLogLevel.*;
-import static scraper.util.NodeUtil.flowOf;
+
 
 /**
  * A socket node intercepts incoming GET requests at the specified port with format
@@ -183,7 +183,7 @@ public final class SocketNode implements FunctionalNode {
         parameters = URLEncodedUtils.parse(uri2.getQuery(), StandardCharsets.UTF_8);
 
         for (NameValuePair parameter : parameters) {
-            args.put(putParamsPrefix + parameter.getName(), parameter.getValue());
+            args.output(putParamsPrefix + parameter.getName(), parameter.getValue());
         }
 
         return decode(parameters.get(0).getValue(), StandardCharsets.UTF_8);
@@ -199,7 +199,7 @@ public final class SocketNode implements FunctionalNode {
             IOException, ExecutionException, RequestMappingException, NodeException, InterruptedException {
         n.log(INFO,"Request for query '{}'", param);
 
-        if(put != null) args.put(put, param);
+        if(put != null) args.output(put, param);
 
         // guard for multiple same requests
         boolean skip = false;
@@ -288,7 +288,7 @@ public final class SocketNode implements FunctionalNode {
 
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         //save map
-        currentArgs = NodeUtil.flowOf(o);
+        currentArgs = o.copy();
 
         if(!started.getAndSet(true)) {
             n.log(DEBUG,"Starting socket server...");
@@ -387,9 +387,10 @@ public final class SocketNode implements FunctionalNode {
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             sync();
 
-            FlowMap args = flowOf(node.currentArgs);
+            FlowMap args = node.currentArgs.copy();
+
             String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            args.put(putBody, body);
+            args.output(putBody, body);
 
             handle(req, resp, args);
         }
@@ -399,7 +400,7 @@ public final class SocketNode implements FunctionalNode {
                 throws IOException {
             sync();
 
-            FlowMap args = flowOf(node.currentArgs);
+            FlowMap args = node.currentArgs.copy();
             handle(request,response, args);
         }
 

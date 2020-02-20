@@ -64,7 +64,7 @@ public class Pr0grammLoginNode implements Node {
                 String value = cookie.substring(cookie.indexOf("=")+1, cookie.indexOf(";"));
                 n.log(NodeLogLevel.INFO, "Cookie: {} -> {}", key, value);
 
-                o.put(key, value);
+                o.output(key, value);
             }
 
         } catch (IOException | InterruptedException | TimeoutException | ExecutionException e) {

@@ -68,7 +68,7 @@ public final class ReadChunkAndFilterNode implements StreamNode {
                     if(current == 0) {
                         current--;
 
-                        FlowMap out = NodeUtil.flowOf(o);
+                        FlowMap out = o.copy();
                         out.output(output, builder.toString());
                         n.streamFlowMap(o, out);
                     }

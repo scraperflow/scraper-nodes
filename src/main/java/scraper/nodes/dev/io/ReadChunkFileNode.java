@@ -52,7 +52,7 @@ public final class ReadChunkFileNode implements StreamNode {
             while (line != null) {
                 splitContent.append(line).append("\n");
                 if (current > splitAfterLines) {
-                    FlowMap out = NodeUtil.flowOf(o);
+                    FlowMap out = o.copy();
                     out.output(output, splitContent.toString());
                     n.streamFlowMap(o, out);
                     splitContent = new StringBuilder();
@@ -65,7 +65,7 @@ public final class ReadChunkFileNode implements StreamNode {
             }
 
             if (splitContent.length() > 0) {
-                FlowMap out = NodeUtil.flowOf(o);
+                FlowMap out = o.copy();
                 out.output(output, splitContent.toString());
                 n.streamFlowMap(o, out);
             }

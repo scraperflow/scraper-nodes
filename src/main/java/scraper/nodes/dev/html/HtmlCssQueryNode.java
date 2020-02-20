@@ -51,8 +51,8 @@ public final class HtmlCssQueryNode implements StreamNode {
         Document doc = Jsoup.parse(rawHtml);
         Elements elements = doc.select(query);
         for (Element element : elements) {
-            FlowMap copy = NodeUtil.flowOf(o);
-            copy.put(put, textOnly ? element.text() : element.html());
+            FlowMap copy = o.copy();
+            copy.output(put, textOnly ? element.text() : element.html());
 
             n.streamFlowMap(o, copy);
 

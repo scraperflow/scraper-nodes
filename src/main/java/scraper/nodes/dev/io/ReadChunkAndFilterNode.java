@@ -41,7 +41,7 @@ public final class ReadChunkAndFilterNode implements StreamNode {
     @Override
     public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
-        n.collect(o, List.of(output.getRawJson()));
+        n.collect(o, List.of(String.valueOf(output.getTerm().getRaw())));
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
 

@@ -8,7 +8,8 @@ import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.type.FunctionalNode;
-import scraper.api.reflect.T;
+import scraper.api.template.L;
+import scraper.api.template.T;
 
 import java.io.IOException;
 
@@ -27,8 +28,8 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
     @FlowKey(defaultValue = "\"{content}\"")
     private T<String> content = new T<>(){};
 
-    @FlowKey(defaultValue = "\"exists\"", output = true) @NotNull
-    private final T<Boolean> result = new T<>(){};
+    @FlowKey(defaultValue = "\"exists\"")
+    private final L<Boolean> result = new L<>(){};
 
     @Override
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {

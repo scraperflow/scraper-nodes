@@ -1,5 +1,6 @@
 package scraper.nodes.dev.io;
 
+import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
@@ -7,8 +8,8 @@ import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
-import scraper.api.reflect.T;
-import scraper.util.NodeUtil;
+import scraper.api.template.L;
+import scraper.api.template.T;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,8 +27,8 @@ public final class ReadChunkAndFilterNode implements StreamNode {
     private final T<String> inputFile = new T<>(){};
 
     /** Where the output line will be put */
-    @FlowKey(defaultValue = "\"output\"", output = true)
-    private T<String> output = new T<>(){};
+    @FlowKey(defaultValue = "\"output\"")
+    private L<String> output = new L<>(){};
 
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
@@ -39,7 +40,7 @@ public final class ReadChunkAndFilterNode implements StreamNode {
     private Integer includeAfterMatch;
 
     @Override
-    public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
         n.collect(o, List.of(String.valueOf(output.getTerm().getRaw())));
 

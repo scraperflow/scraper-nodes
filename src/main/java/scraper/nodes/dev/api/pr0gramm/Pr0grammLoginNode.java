@@ -9,7 +9,7 @@ import scraper.api.flow.FlowMap;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.container.NodeLogLevel;
 import scraper.api.node.type.Node;
-import scraper.api.reflect.T;
+import scraper.api.template.T;
 import scraper.api.service.proxy.ProxyMode;
 import scraper.api.service.proxy.ReservationToken;
 

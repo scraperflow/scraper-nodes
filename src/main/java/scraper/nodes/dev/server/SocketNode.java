@@ -25,9 +25,8 @@ import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.node.type.Node;
-import scraper.api.reflect.T;
+import scraper.api.template.T;
 import scraper.core.AbstractNode;
-import scraper.util.NodeUtil;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

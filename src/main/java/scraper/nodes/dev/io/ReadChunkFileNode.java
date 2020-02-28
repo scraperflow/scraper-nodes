@@ -8,8 +8,8 @@ import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
-import scraper.api.reflect.T;
-import scraper.util.NodeUtil;
+import scraper.api.template.L;
+import scraper.api.template.T;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,12 +27,11 @@ public final class ReadChunkFileNode implements StreamNode {
     private final T<String> inputFile = new T<>(){};
 
     /** Where the output line will be put */
-    @FlowKey(defaultValue = "\"output\"", output = true)
-    private T<String> output = new T<>(){};
+    @FlowKey(defaultValue = "\"output\"")
+    private L<String> output = new L<>(){};
 
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
-
 
     @FlowKey(defaultValue = "1000")
     private Integer splitAfterLines;
@@ -40,7 +39,7 @@ public final class ReadChunkFileNode implements StreamNode {
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
-        n.collect(o, List.of(String.valueOf(output.getTerm().getRaw())));
+        n.collect(o, List.of(o.eval(output)));
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
             StringBuilder splitContent = new StringBuilder();

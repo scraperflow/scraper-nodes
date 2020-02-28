@@ -7,7 +7,8 @@ import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeLogLevel;
 import scraper.api.node.type.FunctionalNode;
-import scraper.api.reflect.T;
+import scraper.api.template.L;
+import scraper.api.template.T;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,38 +26,38 @@ public class Pr0grammLogApiNode implements FunctionalNode {
     private final T<String> logString = new T<>(){};
 
     /** Item favorites are saved here in a ID list if specified */
-    @FlowKey(output = true)
-    private final T<List<Long>> itemFavorites = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> itemFavorites = new L<>(){};
 
     /** Comment favorites are saved here in a ID list if specified */
-    @FlowKey(output = true)
-    private final T<List<Long>> commentFavorites = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> commentFavorites = new L<>(){};
 
 
     /** Item likes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> itemLikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> itemLikes = new L<>(){};
 
     /** Comment likes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> commentLikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> commentLikes = new L<>(){};
 
     /** Tag likes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> tagLikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> tagLikes = new L<>(){};
 
 
     /** Item dislikes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> itemDislikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> itemDislikes = new L<>(){};
 
     /** Comment dislikes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> commentDislikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> commentDislikes = new L<>(){};
 
     /** Tag dislikes are saved here in a ID list */
-    @FlowKey(output = true)
-    private final T<List<Long>> tagDislikes = new T<>(){};
+    @FlowKey
+    private final L<List<Long>> tagDislikes = new L<>(){};
 
     /** Used to decode Base64 content */
     private final Base64.Decoder base64 = Base64.getDecoder();
@@ -120,9 +121,9 @@ public class Pr0grammLogApiNode implements FunctionalNode {
         insertIfNotNull(tagDislikes, tDislikes, o);
     }
 
-    private void insertIfNotNull(T<List<Long>> key, List<Long> result, FlowMap o) {
-        List<Long> outt = o.eval(key);
-        if(outt != null) o.output(key, result);
+    private void insertIfNotNull(L<List<Long>> key, List<Long> result, FlowMap o) {
+        String loc = o.eval(key);
+        if(loc != null) o.output(key, result);
     }
 
 }

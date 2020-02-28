@@ -11,8 +11,7 @@ import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
-import scraper.api.reflect.T;
-import scraper.util.NodeUtil;
+import scraper.api.template.T;
 
 import java.util.List;
 

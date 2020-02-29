@@ -12,13 +12,14 @@ import scraper.api.template.L;
 import scraper.api.template.T;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Checks string duplicates persistently
  *
  * @author Albert Schimpf
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.2.0")
 public final class PersistentDuplicateCheckNode implements FunctionalNode {
 
     /** file path */
@@ -31,11 +32,20 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
     @FlowKey(defaultValue = "\"exists\"")
     private final L<Boolean> result = new L<>(){};
 
+    @FlowKey
+    private final T<String> appendIfNotFound = new T<>(){};
+
     @Override
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String line = o.eval(content);
         try {
             String check = n.getJobInstance().getFileService().getFirstLineStartsWith(persistentStore, line);
+
+            Optional<String> maybeAppend = o.evalMaybe(appendIfNotFound);
+            if(maybeAppend.isPresent()) {
+                String append = maybeAppend.get();
+                n.getJobInstance().getFileService().ifNoLineFoundAppend(persistentStore, line, () -> append);
+            }
 
             if(check == null) {
                 o.output(result, false);

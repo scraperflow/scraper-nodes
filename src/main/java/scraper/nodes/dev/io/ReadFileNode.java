@@ -11,6 +11,7 @@ import scraper.api.node.type.FunctionalNode;
 import scraper.api.template.L;
 import scraper.api.template.T;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -20,11 +21,11 @@ import java.util.stream.Stream;
 
 /**
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.3.0")
 public final class ReadFileNode implements FunctionalNode {
 
     /** Input file path */
-    @FlowKey(mandatory = true) @EnsureFile
+    @FlowKey(mandatory = true)
     private final T<String> inputFile = new T<>(){};
 
     /** Where the output line will be put */
@@ -36,6 +37,8 @@ public final class ReadFileNode implements FunctionalNode {
 
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
+
+        if(!new File(file).exists()) throw new NodeException(n.getAddress() + ": File does not exist: " + file);
 
         try (Stream<String> stream = Files.lines(Paths.get(file), Charset.forName(charset))) {
 

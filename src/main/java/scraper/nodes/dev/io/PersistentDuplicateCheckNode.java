@@ -39,19 +39,19 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String line = o.eval(content);
         try {
-            String check = n.getJobInstance().getFileService().getFirstLineStartsWith(persistentStore, line);
 
             Optional<String> maybeAppend = o.evalMaybe(appendIfNotFound);
             if(maybeAppend.isPresent()) {
                 String append = maybeAppend.get();
-                n.getJobInstance().getFileService().ifNoLineFoundAppend(persistentStore, line, () -> append);
+                boolean existedBefore = n.getJobInstance().getFileService().ifNoLineEqualsFoundAppend(persistentStore, line, () -> append);
+
+                if(existedBefore) {
+                    o.output(result, true);
+                } else {
+                    o.output(result, false);
+                }
             }
 
-            if(check == null) {
-                o.output(result, false);
-            } else {
-                o.output(result, true);
-            }
         } catch (IOException e) {
             throw new NodeException(e, "Could not access IO");
         }

@@ -29,6 +29,9 @@ public final class PathGlobFile implements StreamNode {
     @FlowKey(mandatory = true)
     private String root;
 
+    @FlowKey(defaultValue = "false")
+    private Boolean includeRoot;
+
     @Override
     public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
         n.collect(o, List.of(o.eval(output)));
@@ -51,7 +54,11 @@ public final class PathGlobFile implements StreamNode {
             public FileVisitResult visitFile(Path path,
                                              BasicFileAttributes attrs) {
                 if (pathMatcher.matches(path)) {
-                    consumer.accept(path.toString().substring(root.length()+1));
+                    if(includeRoot) {
+                        consumer.accept(path.toString());
+                    } else {
+                        consumer.accept(path.toString().substring(root.length()+1));
+                    }
                 }
                 return FileVisitResult.CONTINUE;
             }

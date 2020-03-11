@@ -25,7 +25,7 @@ public final class StopOnEmptyListNode implements Node {
 
     @NotNull
     @Override
-    public FlowMap process(@NotNull NodeContainer<? extends Node> n, @NotNull FlowMap o) throws NodeException {
+    public FlowMap process(@NotNull NodeContainer<? extends Node> n, @NotNull FlowMap o) {
         List check = o.eval(this.check);
 
         if(check.isEmpty()) return o;

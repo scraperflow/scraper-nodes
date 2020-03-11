@@ -41,7 +41,7 @@ public final class HtmlCssQueryNode implements StreamNode {
     private Boolean textOnly;
 
     @Override
-    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
         n.collect(o, List.of(put));
 
         // get html data at location

@@ -328,7 +328,7 @@ public final class SocketNode implements FunctionalNode {
         }
     }
 
-    static void wrapException(HttpServletResponse response, Exception e, String message, int status, String... args) throws IOException {
+    private static void wrapException(HttpServletResponse response, Exception e, String message, int status, String... args) throws IOException {
         ObjectNode node = mapper.createObjectNode();
 
         if(e != null) {

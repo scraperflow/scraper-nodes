@@ -37,7 +37,7 @@ public final class ReadChunkFileNode implements StreamNode {
     private Integer splitAfterLines;
 
     @Override
-    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
         String file = o.eval(inputFile);
         n.collect(o, List.of(o.eval(output)));
 

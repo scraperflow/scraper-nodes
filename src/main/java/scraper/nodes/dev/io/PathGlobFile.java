@@ -43,7 +43,7 @@ public final class PathGlobFile implements StreamNode {
         }
     }
 
-    public void match(String glob, String location, Consumer<String> consumer) throws IOException {
+    private void match(String glob, String location, Consumer<String> consumer) throws IOException {
 
         final PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(
                 glob);

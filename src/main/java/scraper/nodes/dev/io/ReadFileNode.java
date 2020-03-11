@@ -1,7 +1,6 @@
 package scraper.nodes.dev.io;
 
 import scraper.annotations.NotNull;
-import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;

@@ -1,10 +1,10 @@
 dependencies {
-    implementation(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11') { exclude group: 'commons-logging', module: 'commons-logging' }
-    implementation(group: 'commons-io', name: 'commons-io', version: '2.6') { exclude group: 'commons-logging', module: 'commons-logging' }
+    provided(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11') { exclude group: 'commons-logging', module: 'commons-logging' }
+    provided(group: 'commons-io', name: 'commons-io', version: '2.6') { exclude group: 'commons-logging', module: 'commons-logging' }
 
-    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
-    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'
-    implementation group: 'org.eclipse.jetty', name: 'jetty-rewrite', version: '9.4.26.v20200117'
+    provided group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
+    provided group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'
+    provided group: 'org.eclipse.jetty', name: 'jetty-rewrite', version: '9.4.26.v20200117'
 
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+    provided group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 }

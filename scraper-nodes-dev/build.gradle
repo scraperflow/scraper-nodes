@@ -4,8 +4,6 @@ if (findProject(':scraper-nodes') == null) {
     apply from: 'gradle/gradle-module-fix.gradle'
 }
 
-apply from: 'gradle/scraper-plugin.gradle'
-
 version = '0.1.0'
 
 dependencies {

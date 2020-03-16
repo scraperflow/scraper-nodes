@@ -4,7 +4,6 @@ import scraper.nodes.dev.server.SocketNode;
 open module scraper.nodes.dev {
     requires scraper.annotations;
     requires scraper.api;
-    requires scraper.core;
 
     requires java.net.http;
     requires com.fasterxml.jackson.databind;

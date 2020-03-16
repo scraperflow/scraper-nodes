@@ -3,6 +3,7 @@ package scraper.nodes.dev.io;
 import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.Io;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
@@ -20,18 +21,22 @@ import java.util.Optional;
  * @author Albert Schimpf
  */
 @NodePlugin("0.2.0")
+@Io
 public final class PersistentDuplicateCheckNode implements FunctionalNode {
 
-    /** file path */
+    /** File path to the store used to check duplicates */
     @FlowKey(mandatory = true) @EnsureFile
     private String persistentStore;
 
+    /** Content to check in the store */
     @FlowKey(defaultValue = "\"{content}\"")
     private T<String> content = new T<>(){};
 
+    /** Where the result is stored */
     @FlowKey(defaultValue = "\"exists\"")
     private final L<Boolean> result = new L<>(){};
 
+    /** Append this content if not found in store */
     @FlowKey
     private final T<String> appendIfNotFound = new T<>(){};
 

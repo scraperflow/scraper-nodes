@@ -15,9 +15,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import scraper.annotations.NotNull;
-import scraper.annotations.node.Argument;
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.NodePlugin;
+import scraper.annotations.node.*;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.Address;
@@ -53,11 +51,12 @@ import static scraper.api.node.container.NodeLogLevel.*;
 
 
 /**
- * A socket node intercepts incoming GET requests at the specified port with format
+ * A socket node intercepts incoming <code>GET</code> requests at the specified port with format
  * <pre>
  *     /?q=...
  * </pre>
- * Puts the requests (everything after the '=') at the field 'put' if specified. <p>
+ * Puts the requests (everything after the '=') at the field 'put' if specified.
+ * <p>
  * It responds with a string representation of the result Object (at the 'expected' field) or a JSON response if an exception occurred.
  *<p>
  *  If caching is enabled, queries are cached and return the same result if queried twice. Caching is on by default.
@@ -67,32 +66,33 @@ import static scraper.api.node.container.NodeLogLevel.*;
  *</p>
  *
  * <p>
- *     Example args .scrape definition:
+ *     Example usage (yaml):
  *
  * <pre>
- * {
- *   "type"      : "SocketNode",
- *   "__comment" : "Forwards actions to the appropriate nodes",
- *   "port"      : "{socket-port}",
- *   "cache"     : false,
- *   "expected"  : "result",
- *   "args"      : {
- *     "STATE"  : "getElapsedErrorTime",
- *     "TIMEOUT": "getTimeLeft",
- *     "OFF"    : "fridgeOff",
- *     "ON"     : "fridgeOn"
- *   },
- *   "goTo": "initPings",
- *   "ignoreLogs" : ["STATE", "TIMEOUT"]
- * },
+ * # Forwards actions to the appropriate nodes
+ * type: SocketNode
+ * port: "{socket-port}"
+ * cache: false
+ * expected: result
+ * args:
+ *   STATE: getElapsedErrorTime
+ *   TIMEOUT: getTimeLeft
+ *   OFF: fridgeOff
+ *   ON: fridgeOn
+ * goTo: initPings
+ * ignoreLogs: [STATE, TIMEOUT]
  * </pre>
  *</p>
  *
- * @see AbstractNode
- * @author Albert Schimpf
- * @author Marco Meides
+ * Authors:
+ * <ul>
+ *     <li>Albert Schimpf</li>
+ *     <li>Marco Meides</li>
+ * </ul>
  */
 @NodePlugin("0.6.0")
+@Stateful
+@Io
 public final class SocketNode implements FunctionalNode {
 
     /** Port of the server */
@@ -100,7 +100,7 @@ public final class SocketNode implements FunctionalNode {
     private Integer port;
 
     /** After the return of the forward call, the result object is expected at this key */
-    @FlowKey @NotNull
+    @FlowKey
     private final T<String> expected = new T<>(){};
 
     /** If expected is a file */
@@ -111,8 +111,7 @@ public final class SocketNode implements FunctionalNode {
     @FlowKey
     private String put;
 
-    /** POST body is saved at this key location, if any
-     * @since 0.4 */
+    /** <code>POST</code> body is saved at this key location, if any */
     @FlowKey(defaultValue = "\"body\"")
     private String putBody;
 
@@ -120,18 +119,18 @@ public final class SocketNode implements FunctionalNode {
     @FlowKey(defaultValue = "\"text/plain\"")
     private T<String> contentType = new T<>(){};
 
-    /** Additional GET-request parameters, if any, are saved as a parameter list at this key location */
+    /** Additional GET request parameters, if any, are saved as a parameter list at this key location */
     @FlowKey(defaultValue = "\"\"")
     private String putParamsPrefix;
 
     @FlowKey(defaultValue = "{}")
     private final T<Map<String, String>> responseHeaders = new T<>(){};
 
-    /** Caches {@link #expected} for same requests. Should not be used together with zip output. */
+    /** Caches <code>expected</code> for same requests. Should not be used together with zip output. */
     @FlowKey(defaultValue = "false")
     private Boolean cache;
 
-    /** hostname to target label mapping, if any */
+    /** Hostname to target label mapping, if any */
     @FlowKey
     private T<Map<String, Address>> hostMap = new T<>(){};
 

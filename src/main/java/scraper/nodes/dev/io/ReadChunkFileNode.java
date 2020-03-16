@@ -3,8 +3,8 @@ package scraper.nodes.dev.io;
 import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.Io;
 import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
@@ -18,8 +18,11 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
+ * Reads an input file in chunks.
+ * Splits after <var>splitAfterLines</var> many lines read.
  */
 @NodePlugin("0.1.0")
+@Io
 public final class ReadChunkFileNode implements StreamNode {
 
     /** Input file path */
@@ -30,9 +33,11 @@ public final class ReadChunkFileNode implements StreamNode {
     @FlowKey(defaultValue = "\"output\"")
     private L<String> output = new L<>(){};
 
+    /** Charset of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
 
+    /** Split after this many lines */
     @FlowKey(defaultValue = "1000")
     private Integer splitAfterLines;
 

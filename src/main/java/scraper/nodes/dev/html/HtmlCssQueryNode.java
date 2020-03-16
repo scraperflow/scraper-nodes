@@ -7,7 +7,6 @@ import org.jsoup.select.Elements;
 import scraper.annotations.NotNull;
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
@@ -16,11 +15,12 @@ import scraper.api.template.T;
 import java.util.List;
 
 /**
+ * Executes a css query on a html String.
  */
 @NodePlugin("0.1.0")
 public final class HtmlCssQueryNode implements StreamNode {
 
-    /** Expect a raw html string at key defined by 'html' */
+    /** Raw html String */
     @FlowKey(mandatory = true)
     private final T<String> html = new T<>(){};
 

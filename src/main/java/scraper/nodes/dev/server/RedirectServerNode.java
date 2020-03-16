@@ -6,9 +6,7 @@ import org.eclipse.jetty.rewrite.handler.RewriteRegexRule;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import scraper.annotations.NotNull;
-import scraper.annotations.node.Argument;
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.NodePlugin;
+import scraper.annotations.node.*;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
@@ -16,7 +14,6 @@ import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.node.type.Node;
 import scraper.api.template.T;
-import scraper.core.AbstractNode;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,11 +23,10 @@ import static scraper.api.node.container.NodeLogLevel.*;
 
 /**
  * Redirects urls to other urls.
- *
- * @see AbstractNode
- * @author Albert Schimpf
  */
 @NodePlugin("0.1.0")
+@Io
+@Stateful
 public final class RedirectServerNode implements FunctionalNode {
 
     /** Port of the server */
@@ -39,14 +35,16 @@ public final class RedirectServerNode implements FunctionalNode {
 
     /**
      * Regex to url mapping, e.g
-     *   "/reverse/([^/]*)/(.*)" -> "/reverse/$2/$1"
+     * <pre>
+     *  "/reverse/([^/]*)/(.*)": "/reverse/$2/$1" </pre>
      */
     @FlowKey(defaultValue = "{}")
     private T<Map<String, String>> regexRedirect = new T<>(){};
 
     /**
      * Pattern to url mapping, e.g
-     *   "/reverse/*" -> "http://redirected.org"
+     * <pre>
+     *  "/reverse/*": "http://redirected.org" </pre>
      */
     @FlowKey(defaultValue = "{}")
     private T<Map<String, String>> patternRedirect = new T<>(){};

@@ -1,6 +1,8 @@
 package scraper.nodes.dev.io;
 
+import scraper.annotations.NotNull;
 import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.Io;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
@@ -15,25 +17,36 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
+ * Provides a path glob starting from a given root and streams all matches.
+ * Example:
+ * <pre>
+ * type: PathGlobFileNode
+ * root: .
+ * glob: "glob:**&#47;*.java"
+ * </pre>
  */
 @NodePlugin("0.1.0")
-public final class PathGlobFile implements StreamNode {
+@Io
+public final class PathGlobFileNode implements StreamNode {
 
-    /** Where the output file path will be put. If there's already a list at that key, it will be replaced. */
+    /** Where the output file path will be put. */
     @FlowKey(defaultValue = "\"file\"")
     private L<String> output = new L<>(){};
 
+    /** Syntax and pattern, see Javas PathMatcher.getPathMatcher documentation. */
     @FlowKey(mandatory = true)
     private String glob;
 
+    /** The root folder from where to start */
     @FlowKey(mandatory = true)
     private String root;
 
+    /** Includes the root as a match or not */
     @FlowKey(defaultValue = "false")
     private Boolean includeRoot;
 
     @Override
-    public void process(StreamNodeContainer n, FlowMap o) throws NodeException {
+    public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         n.collect(o, List.of(o.eval(output)));
 
         try {

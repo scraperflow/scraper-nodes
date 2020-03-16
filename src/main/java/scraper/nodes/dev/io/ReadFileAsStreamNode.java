@@ -3,6 +3,7 @@ package scraper.nodes.dev.io;
 import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.Io;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
@@ -19,8 +20,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
+ * Reads a file and streams each line.
  */
 @NodePlugin("0.1.0")
+@Io
 public final class ReadFileAsStreamNode implements StreamNode {
 
     /** Input file path */
@@ -31,6 +34,7 @@ public final class ReadFileAsStreamNode implements StreamNode {
     @FlowKey(defaultValue = "\"output\"")
     private L<String> output = new L<>(){};
 
+    /** Charset of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
 

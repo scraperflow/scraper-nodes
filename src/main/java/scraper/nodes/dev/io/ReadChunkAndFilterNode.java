@@ -3,6 +3,7 @@ package scraper.nodes.dev.io;
 import scraper.annotations.NotNull;
 import scraper.annotations.node.EnsureFile;
 import scraper.annotations.node.FlowKey;
+import scraper.annotations.node.Io;
 import scraper.annotations.node.NodePlugin;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
@@ -18,8 +19,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
+ * Reads an input file in chunks.
+ * Reads until the <var>filter</var> applies,
+ * then includes that line and <var>includeAfterMatch</var> many lines
+ * as one stream output String.
  */
 @NodePlugin("0.1.0")
+@Io
 public final class ReadChunkAndFilterNode implements StreamNode {
 
     /** Input file path */
@@ -30,12 +36,15 @@ public final class ReadChunkAndFilterNode implements StreamNode {
     @FlowKey(defaultValue = "\"output\"")
     private L<String> output = new L<>(){};
 
+    /** Charset of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
     private String charset;
 
+    /** Line contains filter check */
     @FlowKey
     private String filter;
 
+    /** How many lines after the matching line to include */
     @FlowKey
     private Integer includeAfterMatch;
 
@@ -52,9 +61,6 @@ public final class ReadChunkAndFilterNode implements StreamNode {
             String line = reader.readLine();
 
             while (line != null) {
-//                if(!line.contains(filter) && current == -1) {
-//                    // does not contain filter
-//                    // no include after match, skip
                 if(line.contains(filter)) {
                     // contains filter, possibly resets builder
                     builder = new StringBuilder();

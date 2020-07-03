@@ -34,7 +34,7 @@ public final class ReadChunkAndFilterNode implements StreamNode {
 
     /** Where the output line will be put */
     @FlowKey(defaultValue = "\"output\"")
-    private L<String> output = new L<>(){};
+    private final L<String> output = new L<>(){};
 
     /** Charset of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
@@ -51,7 +51,7 @@ public final class ReadChunkAndFilterNode implements StreamNode {
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
-        n.collect(o, List.of(String.valueOf(output.getTerm().getRaw())));
+        n.collect(o, List.of(o.evalLocation(output)));
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
 

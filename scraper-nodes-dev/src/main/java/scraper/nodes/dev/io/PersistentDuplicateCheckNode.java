@@ -13,7 +13,6 @@ import scraper.api.template.L;
 import scraper.api.template.T;
 
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Checks string duplicates persistently
@@ -30,7 +29,7 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
 
     /** Content to check in the store */
     @FlowKey(defaultValue = "\"{content}\"")
-    private T<String> content = new T<>(){};
+    private final T<String> content = new T<>(){};
 
     /** Where the result is stored */
     @FlowKey(defaultValue = "\"exists\"")
@@ -45,16 +44,11 @@ public final class PersistentDuplicateCheckNode implements FunctionalNode {
         String line = o.eval(content);
         try {
 
-            Optional<String> maybeAppend = o.evalMaybe(appendIfNotFound);
-            if(maybeAppend.isPresent()) {
-                String append = maybeAppend.get();
-                boolean existedBefore = n.getJobInstance().getFileService().ifNoLineEqualsFoundAppend(persistentStore, line, () -> append);
+            String maybeAppend = o.eval(appendIfNotFound);
+            if(maybeAppend != null) {
+                boolean existedBefore = n.getJobInstance().getFileService().ifNoLineEqualsFoundAppend(persistentStore, line, () -> maybeAppend);
 
-                if(existedBefore) {
-                    o.output(result, true);
-                } else {
-                    o.output(result, false);
-                }
+                o.output(result, existedBefore);
             }
 
         } catch (IOException e) {

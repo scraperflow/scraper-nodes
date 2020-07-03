@@ -39,7 +39,7 @@ public final class RedirectServerNode implements FunctionalNode {
      *  "/reverse/([^/]*)/(.*)": "/reverse/$2/$1" </pre>
      */
     @FlowKey(defaultValue = "{}")
-    private T<Map<String, String>> regexRedirect = new T<>(){};
+    private final T<Map<String, String>> regexRedirect = new T<>(){};
 
     /**
      * Pattern to url mapping, e.g
@@ -47,9 +47,9 @@ public final class RedirectServerNode implements FunctionalNode {
      *  "/reverse/*": "http://redirected.org" </pre>
      */
     @FlowKey(defaultValue = "{}")
-    private T<Map<String, String>> patternRedirect = new T<>(){};
+    private final T<Map<String, String>> patternRedirect = new T<>(){};
 
-    private AtomicBoolean started = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     @Override
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {

@@ -31,7 +31,7 @@ public final class ReadChunkFileNode implements StreamNode {
 
     /** Where the output line will be put */
     @FlowKey(defaultValue = "\"output\"")
-    private L<String> output = new L<>(){};
+    private final L<String> output = new L<>(){};
 
     /** Charset of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")
@@ -44,7 +44,7 @@ public final class ReadChunkFileNode implements StreamNode {
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
         String file = o.eval(inputFile);
-        n.collect(o, List.of(o.eval(output)));
+        n.collect(o, List.of(o.evalLocation(output)));
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
             StringBuilder splitContent = new StringBuilder();

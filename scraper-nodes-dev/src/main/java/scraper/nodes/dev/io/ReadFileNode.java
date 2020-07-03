@@ -34,7 +34,7 @@ public final class ReadFileNode implements FunctionalNode {
 
     /** Where the output line will be put */
     @FlowKey(defaultValue = "\"output\"")
-    private L<String> output = new L<>(){};
+    private final L<String> output = new L<>(){};
 
     /** Character encoding of the file */
     @FlowKey(defaultValue = "\"ISO_8859_1\"")

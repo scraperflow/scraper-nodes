@@ -23,6 +23,7 @@ import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.node.type.Node;
+import scraper.api.template.L;
 import scraper.api.template.T;
 
 import javax.servlet.http.HttpServlet;
@@ -89,61 +90,66 @@ import static scraper.api.node.container.NodeLogLevel.*;
  *     <li>Marco Meides</li>
  * </ul>
  */
-@NodePlugin("0.6.0")
+@NodePlugin("0.7.0")
 @Stateful
 @Io
 public final class SocketNode implements FunctionalNode {
-
-    /** Port of the server */
-    @FlowKey(defaultValue = "8080") @Argument
-    private Integer port;
 
     /** After the return of the forward call, the result object is expected at this key */
     @FlowKey
     private final T<String> expected = new T<>(){};
 
-    /** If expected is a file */
-    @FlowKey(defaultValue = "false") @Argument
-    private Boolean isFile;
-
-    /** Request is saved at this key location, if any */
-    @FlowKey
-    private String put;
-
-    /** <code>POST</code> body is saved at this key location, if any */
-    @FlowKey(defaultValue = "\"body\"")
-    private String putBody;
-
     /** Content type if result is a file */
     @FlowKey(defaultValue = "\"text/plain\"")
-    private T<String> contentType = new T<>(){};
+    private final T<String> contentType = new T<>(){};
 
-    /** Additional GET request parameters, if any, are saved as a parameter list at this key location */
-    @FlowKey(defaultValue = "\"\"")
-    private String putParamsPrefix;
+    /** Hostname to target label mapping, if any */
+    @FlowKey
+    private final T<Map<String, Address>> hostMap = new T<>(){};
+
+    /** Literal request to target label mapping, if any */
+    @FlowKey
+    private final T<Map<String, Address>> args = new T<>(){};
 
     @FlowKey(defaultValue = "{}")
     private final T<Map<String, String>> responseHeaders = new T<>(){};
+
+    /** basic auth, name password pairs */
+    @FlowKey(defaultValue = "{}")
+    private final T<Map<String, String>> basicAuth = new T<>(){};
+
+
+
+    /** Request is saved at this key location, if any */
+    @FlowKey(defaultValue = "\"_\"")
+    private final L<String> put = new L<>(){};
+
+    /** <code>POST</code> body is saved at this key location, if any */
+    @FlowKey(defaultValue = "\"_\"")
+    private final L<String> putBody = new L<>(){};
+
+    /** Additional GET request parameters, if any, are saved as a parameter map at this key location */
+    @FlowKey(defaultValue = "\"_\"")
+    private final L<Map<String, String>> putParamsPrefixMap = new L<>(){};
+
+
+
+    /** Port of the server */
+    @FlowKey(defaultValue = "8080") @Argument
+    private Integer port;
+
+    /** Prefix for additional parameters */
+    @FlowKey(defaultValue = "\"\"")
+    private String putParamsPrefix;
 
     /** Caches <code>expected</code> for same requests. Should not be used together with zip output. */
     @FlowKey(defaultValue = "false")
     private Boolean cache;
 
-    /** Hostname to target label mapping, if any */
-    @FlowKey
-    private T<Map<String, Address>> hostMap = new T<>(){};
-
-    /** Literal request to target label mapping, if any */
-    @FlowKey
-    private T<Map<String, Address>> args = new T<>(){};
-
     /** Limits requests to one at a time if true */
     @FlowKey(defaultValue = "false")
     private Boolean queue;
 
-    /** basic auth, name password pairs */
-    @FlowKey(defaultValue = "{}")
-    private T<Map<String, String>> basicAuth = new T<>(){};
 
     // caching
     private final Map<String, Object> resultCache = new ConcurrentHashMap<>();
@@ -153,7 +159,7 @@ public final class SocketNode implements FunctionalNode {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private FlowMap currentArgs;
-    private AtomicBoolean started = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     private String getRequest(HttpServletRequest request, HttpServletResponse response, FlowMap args) throws IOException, URISyntaxException {
         final String uri = ((Request) request).getOriginalURI();
@@ -179,9 +185,10 @@ public final class SocketNode implements FunctionalNode {
 
         parameters = URLEncodedUtils.parse(uri2.getQuery(), StandardCharsets.UTF_8);
 
-        for (NameValuePair parameter : parameters) {
-            args.output(putParamsPrefix + parameter.getName(), parameter.getValue());
-        }
+        args.output(putParamsPrefixMap, parameters.stream()
+                .map(p -> Map.entry(putParamsPrefix + p.getName(), p.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
 
         return decode(parameters.get(0).getValue(), StandardCharsets.UTF_8);
     }
@@ -196,7 +203,7 @@ public final class SocketNode implements FunctionalNode {
             IOException, ExecutionException, RequestMappingException, NodeException, InterruptedException {
         n.log(INFO,"Request for query '{}'", param);
 
-        if(put != null) args.output(put, param);
+        args.output(put, param);
 
         // guard for multiple same requests
         boolean skip = false;
@@ -234,38 +241,37 @@ public final class SocketNode implements FunctionalNode {
         args.eval(responseHeaders).forEach(response::setHeader);
         response.setContentType(args.eval(contentType));
 
-        if(!isFile) {
+//        if(!isFile) {
             response.getWriter().print(((resultString == null ? "null" : resultString.toString())));
-        } else {
-            streamContent(n, response, args);
-        }
-
+//        } else {
+//            streamContent(n, response, args);
+//        }
     }
 
-    private void streamContent(NodeContainer<? extends Node> n, HttpServletResponse response, FlowMap o) throws IOException {
-        String filePath = n.getJobInstance().getFileService().getTemporaryDirectory()+File.separator+o.eval(expected);
-        try (FileInputStream fs = new FileInputStream(filePath)) {
-            IOUtils.copy(fs, response.getOutputStream());
-        }
-        if(!new File(filePath).delete()) {
-            n.log(WARN,"Could not delete streamed zip file: {}", filePath);
-        }
-    }
+//    private void streamContent(NodeContainer<? extends Node> n, HttpServletResponse response, FlowMap o) throws IOException {
+//        String filePath = n.getJobInstance().getFileService().getTemporaryDirectory()+File.separator+o.eval(expected);
+//        try (FileInputStream fs = new FileInputStream(filePath)) {
+//            IOUtils.copy(fs, response.getOutputStream());
+//        }
+//        if(!new File(filePath).delete()) {
+//            n.log(WARN,"Could not delete streamed zip file: {}", filePath);
+//        }
+//    }
 
 
      // socket node is never interrupted while waiting for the future
     private Object createRequest(NodeContainer<?> n, final String url, final FlowMap o)
             throws MalformedURLException, RequestMappingException,
             ExecutionException, NodeException, InterruptedException {
-        Optional<Map<String, Address>> hostMap = o.evalIdentityMaybe(this.hostMap);
-        Optional<Map<String, Address>> args = o.evalIdentityMaybe(this.args);
+        Map<String, Address> hostMap = o.evalIdentity(this.hostMap);
+        Map<String, Address> args = o.evalIdentity(this.args);
 
         Address process;
-        if (hostMap.isPresent()) {
-            process = hostMap.get().get(new URL(url).getHost());
+        if (!hostMap.isEmpty()) {
+            process = hostMap.get(new URL(url).getHost());
             if(process == null) throw new RequestMappingException("Host mapping not defined: " + url);
-        } else if (args.isPresent()){
-            process = args.get().get(url);
+        } else if (!args.isEmpty()){
+            process = args.get(url);
             if(process == null) throw new RequestMappingException("Request mapping not defined: " + url);
         } else {
             throw new NodeException("Neither a host mapping nor a request mapping is defined");
@@ -275,12 +281,12 @@ public final class SocketNode implements FunctionalNode {
 
         CompletableFuture<FlowMap> futureFlow = n.forkDepend(o, process);
         FlowMap result = futureFlow.get();
-        Optional<String> resultMaybe = result.evalMaybe(expected);
+        String resultStr = result.eval(expected);
 
-        Object output = null;
-        if(!isFile && resultMaybe.isPresent()) output = result.get(result.eval(expected));
-        if(cache != null && cache && output != null) resultCache.put(url, output);
-        return output;
+//        Object output = null;
+//        if(!isFile && resultMaybe != null) output = result.get(resultMaybe);
+        if(cache != null && cache) resultCache.put(url, resultStr);
+        return resultStr;
     }
 
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) throws NodeException {
@@ -355,7 +361,7 @@ public final class SocketNode implements FunctionalNode {
         private final NodeContainer<? extends Node> nodeC;
         private final SocketNode node;
         private final Boolean queue;
-        private final String putBody;
+        private final L<String> putBody;
 
         private final AtomicBoolean waitingForFinish = new AtomicBoolean(false);
 

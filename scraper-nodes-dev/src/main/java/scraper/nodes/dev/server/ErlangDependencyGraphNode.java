@@ -64,6 +64,7 @@ public final class ErlangDependencyGraphNode implements FunctionalNode {
     }
 
 
+    @SafeVarargs
     private String visualize(FlowMap o, List<String> mods, List<String>... calls) {
         StringBuilder b = new StringBuilder();
 

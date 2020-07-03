@@ -4,7 +4,7 @@ if (findProject(':scraper-nodes') == null) {
     apply from: 'gradle/gradle-module-fix.gradle'
 }
 
-version = '0.1.1'
+version = '0.2.0'
 
 dependencies {
     provided(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11') { exclude group: 'commons-logging', module: 'commons-logging' }
@@ -19,9 +19,10 @@ dependencies {
     // already in the main project
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.+'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    testImplementation project(':scraper-plugins:scraper-plugins-core')
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    // TODO why are you doing this to me gradle
+    implementation project(':scraper-plugins:scraper-plugins-core')
     testRuntime project(':scraper-nodes:scraper-nodes-core')
 }
 

@@ -1,8 +1,9 @@
 package scraper.nodes.dev.typechecker;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import scraper.api.di.DIContainer;
 import scraper.api.exceptions.TemplateException;
 import scraper.api.specification.ScrapeInstance;
@@ -16,34 +17,29 @@ import scraper.util.DependencyInjectionUtil;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
-@RunWith(Parameterized.class)
 public class TypeCheckerBadTest {
 
-    private File path;
-
-    public TypeCheckerBadTest(File f) {
-        this.path = f;
-    }
-
-    @Parameterized.Parameters
-    public static Collection primeNumbers() throws Exception {
+    public static Stream<File> pathProvider() throws Exception {
         URL resource = TypeCheckerBadTest.class.getResource("fail");
         File files = new File(resource.toURI());
         File[] allFiles = files.listFiles();
         assert allFiles != null;
-        return Arrays.stream(allFiles).map(f -> new Object[]{ f }).collect(Collectors.toList());
+        return Arrays.stream(allFiles);
     }
 
-    @Test(expected = TemplateException.class)
-    public void testOkCheck() {
-        TypeChecker t = new TypeChecker();
-        ScrapeInstance spec = read(path);
-        ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec, true);
-        t.typeTaskflow(spec, cfg);
+    @Disabled
+    @ParameterizedTest
+    @MethodSource("pathProvider")
+    public void testOkCheck(File path) {
+        Assertions.assertThrows(TemplateException.class, () -> {
+            TypeChecker t = new TypeChecker();
+            ScrapeInstance spec = read(path);
+            ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec, true);
+            t.typeTaskflow(spec, cfg);
+        });
     }
 
     private static ScrapeInstance read(File f) {

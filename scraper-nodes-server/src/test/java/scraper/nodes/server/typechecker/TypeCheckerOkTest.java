@@ -1,7 +1,5 @@
-package scraper.nodes.dev.typechecker;
+package scraper.nodes.server.typechecker;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import scraper.api.di.DIContainer;
@@ -29,7 +27,6 @@ public class TypeCheckerOkTest {
         return Arrays.stream(allFiles);
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("pathProvider")
     public void testOkCheck(File path) {
@@ -49,5 +46,4 @@ public class TypeCheckerOkTest {
             throw new IllegalStateException(e);
         }
     }
-
 }

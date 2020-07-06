@@ -1,0 +1,45 @@
+plugins {
+    id 'jacoco'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    configurations {
+        providedCompile
+    }
+
+    afterEvaluate {
+        dependencies {
+            providedCompile fileTree(dir: 'libs', include: '*.jar')
+            testImplementation fileTree(dir: 'libs', include: '*.jar')
+
+            testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
+            testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.1'
+            testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        }
+
+        compileJava {
+            sourceSets.main.compileClasspath += configurations.providedCompile
+        }
+    }
+
+    group = 'org.scraper'
+
+    plugins.withType(JavaPlugin).configureEach {
+        java {
+            modularity.inferModulePath = true
+        }
+    }
+    
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+}
+
+// merge coverage
+apply from: 'gradle/jacoco-merge.gradle'

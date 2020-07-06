@@ -1,0 +1,31 @@
+plugins {
+    id 'java-library'
+    id 'java-library-distribution'
+    id("de.jjohannes.extra-java-module-info") version "0.1"
+}
+
+version = '0.1.0'
+
+extraJavaModuleInfo {
+    module("commons-logging-1.2.jar", "commons.logging", "1.2") {}
+    module("javax.servlet-api-3.1.0.jar", "javax.servlet.api", "3.1.0") {
+        exports "javax.servlet.http"
+        exports "javax.servlet"
+    }
+}
+
+dependencies {
+    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-rewrite', version: '9.4.26.v20200117'
+
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+
+
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11' //) { exclude group: 'commons-logging', module: 'commons-logging' }
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6' //) { exclude group: 'commons-logging', module: 'commons-logging' }
+}
+
+
+//dependencies {
+//}

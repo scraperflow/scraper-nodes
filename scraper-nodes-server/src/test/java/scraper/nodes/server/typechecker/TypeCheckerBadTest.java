@@ -1,10 +1,10 @@
-package scraper.nodes.dev.typechecker;
+package scraper.nodes.server.typechecker;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import scraper.api.di.DIContainer;
+import scraper.api.exceptions.TemplateException;
 import scraper.api.specification.ScrapeInstance;
 import scraper.api.specification.ScrapeSpecification;
 import scraper.core.JobFactory;
@@ -19,24 +19,25 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 
-public class TypeCheckerOkTest {
+public class TypeCheckerBadTest {
 
     public static Stream<File> pathProvider() throws Exception {
-        URL resource = TypeCheckerOkTest.class.getResource("ok");
+        URL resource = TypeCheckerBadTest.class.getResource("fail");
         File files = new File(resource.toURI());
         File[] allFiles = files.listFiles();
         assert allFiles != null;
         return Arrays.stream(allFiles);
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("pathProvider")
     public void testOkCheck(File path) {
-        TypeChecker t = new TypeChecker();
-        ScrapeInstance spec = read(path);
-        ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec, true);
-        t.typeTaskflow(spec, cfg);
+        Assertions.assertThrows(TemplateException.class, () -> {
+            TypeChecker t = new TypeChecker();
+            ScrapeInstance spec = read(path);
+            ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec, true);
+            t.typeTaskflow(spec, cfg);
+        });
     }
 
     private static ScrapeInstance read(File f) {
@@ -49,5 +50,4 @@ public class TypeCheckerOkTest {
             throw new IllegalStateException(e);
         }
     }
-
 }

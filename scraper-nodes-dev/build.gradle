@@ -1,39 +1,20 @@
-// treat this as a stand-alone project if not used in big scraper project
-if (findProject(':scraper-nodes') == null) {
-    apply from: 'gradle/scraper-plugin.gradle'
-    apply from: 'gradle/gradle-module-fix.gradle'
+plugins {
+    id 'java-library'
+    id 'java-library-distribution'
+    id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
-version = '0.2.0'
+version = '0.2.1'
+
+extraJavaModuleInfo {
+    module("jsoup-1.12.1.jar", "org.jsoup", "1.12.1") {
+        exports "org.jsoup"
+        exports "org.jsoup.nodes"
+        exports "org.jsoup.select"
+    }
+}
 
 dependencies {
-    provided(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11') { exclude group: 'commons-logging', module: 'commons-logging' }
-    provided(group: 'commons-io', name: 'commons-io', version: '2.6') { exclude group: 'commons-logging', module: 'commons-logging' }
-
-    provided group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
-    provided group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'
-    provided group: 'org.eclipse.jetty', name: 'jetty-rewrite', version: '9.4.26.v20200117'
-
-    provided group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
-
-    // already in the main project
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.+'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
-
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-    // TODO why are you doing this to me gradle
-    implementation project(':scraper-plugins:scraper-plugins-core')
-    testRuntime project(':scraper-nodes:scraper-nodes-core')
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 }
 
-task bundleFatJar(type: Jar) { t ->
-    from {
-        configurations.provided.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-    from {
-        sourceSets.main.output
-    }
-
-    archiveFileName = "scraper-nodes-dev-${version}.jar"
-    destinationDirectory = file("$rootDir/build/libs")
-}

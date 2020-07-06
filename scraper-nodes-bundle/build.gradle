@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+    id 'java-library-distribution'
+}
+
+version = '2'
+
+dependencies {
+    implementation project(':scraper-nodes-dev')
+    implementation project(':scraper-nodes-erlang')
+    implementation project(':scraper-nodes-server')
+    implementation project(':scraper-nodes-unstable')
+}
+

@@ -4,7 +4,7 @@ plugins {
     id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
-version = '0.2.1'
+version = '0.2.2'
 
 extraJavaModuleInfo {
     module("jsoup-1.12.1.jar", "org.jsoup", "1.12.1") {

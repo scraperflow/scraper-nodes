@@ -10,6 +10,7 @@ import scraper.annotations.node.NodePlugin;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.StreamNodeContainer;
 import scraper.api.node.type.StreamNode;
+import scraper.api.template.L;
 import scraper.api.template.T;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 /**
  * Executes a css query on a html String.
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.2.0")
 public final class HtmlCssQueryNode implements StreamNode {
 
     /** Raw html String */
@@ -26,7 +27,7 @@ public final class HtmlCssQueryNode implements StreamNode {
 
     /** Puts the parsed element as text to this key */
     @FlowKey(defaultValue = "\"result\"")
-    private String put;
+    private final L<String> put = new L<>(){};
 
     /** Css Query for selecting elements */
     @FlowKey(mandatory = true)
@@ -42,7 +43,7 @@ public final class HtmlCssQueryNode implements StreamNode {
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
-        n.collect(o, List.of(put));
+        n.collect(o, List.of(o.evalLocation(put)));
 
         // get html data at location
         String rawHtml = o.eval(html);

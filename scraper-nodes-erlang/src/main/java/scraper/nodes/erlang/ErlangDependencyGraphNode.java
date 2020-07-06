@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/** Builds a graph out of static, dynamic, and supervisor module calls */
 @NodePlugin("0.0.1")
 @Io
 public final class ErlangDependencyGraphNode implements FunctionalNode {

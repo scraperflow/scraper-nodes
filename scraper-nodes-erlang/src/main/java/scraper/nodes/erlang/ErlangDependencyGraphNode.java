@@ -9,6 +9,7 @@ import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.container.NodeLogLevel;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.template.T;
+import scraper.util.TemplateUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** Builds a graph out of static, dynamic, and supervisor module calls */
-@NodePlugin("0.0.2")
+@NodePlugin("0.1.0")
 @Io
 public final class ErlangDependencyGraphNode implements FunctionalNode {
 
@@ -83,7 +84,7 @@ public final class ErlangDependencyGraphNode implements FunctionalNode {
                         write(b, arrow);
                     } else {
                         // DEFINE?
-                        Optional<?> define = o.get(target);
+                        Optional<?> define = o.evalMaybe(TemplateUtil.templateOf(target));
                         if(define.isPresent()) {
                             write(b, source+"->"+define.get());
                         } else {

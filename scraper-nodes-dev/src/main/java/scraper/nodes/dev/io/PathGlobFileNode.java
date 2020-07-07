@@ -52,7 +52,6 @@ public final class PathGlobFileNode implements StreamNode {
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
-        n.collect(o, List.of(o.evalLocation(output), o.evalLocation(filename)));
         String glob = o.eval(this.glob);
         String root = o.eval(this.root);
 

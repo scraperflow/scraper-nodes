@@ -43,8 +43,6 @@ public final class HtmlCssQueryNode implements StreamNode {
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
-        n.collect(o, List.of(o.evalLocation(put)));
-
         // get html data at location
         String rawHtml = o.eval(html);
 

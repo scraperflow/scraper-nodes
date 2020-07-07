@@ -41,7 +41,6 @@ public final class ReadFileAsStreamNode implements StreamNode {
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
         String file = o.eval(inputFile);
-        n.collect(o, List.of(o.evalLocation(output)));
 
         try (Stream<String> stream = Files.lines(Paths.get(file), Charset.forName(charset))) {
             stream.forEach(line -> n.streamElement(o, output, line));

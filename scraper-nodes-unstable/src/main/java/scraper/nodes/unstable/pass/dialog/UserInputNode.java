@@ -8,6 +8,7 @@ import scraper.api.flow.FlowMap;
 import scraper.api.node.container.FunctionalNodeContainer;
 import scraper.api.node.type.FunctionalNode;
 import scraper.api.template.L;
+import scraper.util.TemplateUtil;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -18,7 +19,7 @@ import static scraper.api.node.container.NodeLogLevel.INFO;
  * Ensures that a key is set, either pre-set or by user input.
  * User input prefers console, otherwise pops up a graphical user prompt.
  */
-@NodePlugin("0.2.0")
+@NodePlugin("0.3.0")
 @Io
 public final class UserInputNode implements FunctionalNode {
 
@@ -42,12 +43,11 @@ public final class UserInputNode implements FunctionalNode {
     public void modify(@NotNull FunctionalNodeContainer n, @NotNull FlowMap o) {
         if (noPromptIfExists) {
             // return if output is present
-            String loc = o.evalLocation(key);
-            if(o.get(loc).isPresent()) {
+            if(o.evalMaybe(TemplateUtil.templateOf(key)).isPresent()) {
                 if(!hidden) {
-                    n.log(INFO, "{}: {}", o.evalLocation(key), o.get(loc).get());
+                    n.log(INFO, "{0}: {1}", o.evalLocation(key), o.eval(TemplateUtil.templateOf(key)));
                 } else {
-                    n.log(INFO, "{} is present", o.evalLocation(key));
+                    n.log(INFO, "{0} is present", o.evalLocation(key));
                 }
                 return;
             }

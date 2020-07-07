@@ -35,7 +35,6 @@ public final class ListFilesNode implements StreamNode {
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {
-        n.collect(o, List.of(o.evalLocation(filename)));
 
         try {
             for (File listFile : new File(o.eval(file)).listFiles()) {

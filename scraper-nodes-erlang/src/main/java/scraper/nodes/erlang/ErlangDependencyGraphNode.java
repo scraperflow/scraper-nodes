@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** Builds a graph out of static, dynamic, and supervisor module calls */
-@NodePlugin("0.0.1")
+@NodePlugin("0.0.2")
 @Io
 public final class ErlangDependencyGraphNode implements FunctionalNode {
 
@@ -50,9 +50,9 @@ public final class ErlangDependencyGraphNode implements FunctionalNode {
         List<String> supcalls = o.eval(supervisorCalls);
         List<String> mods = o.eval(modules);
 
-        n.log(NodeLogLevel.INFO, "Static: {}", scalls);
-        n.log(NodeLogLevel.INFO, "Variable: {}", vcalls);
-        n.log(NodeLogLevel.INFO, "Supervisor: {}", supcalls);
+        n.log(NodeLogLevel.INFO, "Static: {0}", scalls);
+        n.log(NodeLogLevel.INFO, "Variable: {0}", vcalls);
+        n.log(NodeLogLevel.INFO, "Supervisor: {0}", supcalls);
 
 
         String graph = visualize(o, mods, scalls, vcalls, supcalls);

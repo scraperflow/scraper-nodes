@@ -4,7 +4,7 @@ plugins {
     id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
-version = '0.1.0'
+version = '0.2.0'
 
 extraJavaModuleInfo {
     module("commons-logging-1.2.jar", "commons.logging", "1.2") {}

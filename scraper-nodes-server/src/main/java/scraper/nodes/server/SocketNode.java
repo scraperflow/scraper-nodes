@@ -102,10 +102,12 @@ public final class SocketNode implements FunctionalNode {
 
     /** Hostname to target label mapping, if any */
     @FlowKey
+    @Flow(dependent = true, crossed = true, label = "")
     private final T<Map<String, Address>> hostMap = new T<>(){};
 
     /** Literal request to target label mapping, if any */
     @FlowKey
+    @Flow(dependent = true, crossed = true, label = "")
     private final T<Map<String, Address>> args = new T<>(){};
 
     @FlowKey(defaultValue = "{}")

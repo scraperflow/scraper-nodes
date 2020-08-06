@@ -87,7 +87,7 @@ import static scraper.api.node.container.NodeLogLevel.*;
  *     <li>Marco Meides</li>
  * </ul>
  */
-@NodePlugin("0.7.0")
+@NodePlugin("0.8.0")
 @Stateful
 @Io
 public final class SocketNode implements FunctionalNode {

@@ -3,7 +3,7 @@ name: socket
 graphs:
   start:
     - type: SocketNode
-      expected: "{initial}"
-      # initial can never be written
+      expected: "{expect}"
+      # expect can never be written
       hostMap:
 

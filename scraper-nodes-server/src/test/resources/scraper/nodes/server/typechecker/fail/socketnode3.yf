@@ -6,7 +6,7 @@ graphs:
 
     - type: SocketNode
       # this is initial :: String because its separate from the forwarding
-      expected: "{initial}"
+      expected: "{expect}"
       # both request and request2 should provide initial :: String
       hostMap:
         request: request
@@ -20,12 +20,12 @@ graphs:
 
   request:
     - type: EchoNode
-      put: initial
+      put: expect
       value: "1"
 
   request2:
     - type: EchoNode
-      put: initial
+      put: expect
       value: 1
 
 

@@ -28,7 +28,7 @@ import static scraper.api.node.container.NodeLogLevel.ERROR;
  *     Note that the Telegram API has a limit on how big a message is allowed to be.
  * </p>
  */
-@NodePlugin("1.0.1")
+@NodePlugin("1.0.2")
 @Io
 public final class TelegramNode implements FunctionalNode {
 
@@ -66,7 +66,7 @@ public final class TelegramNode implements FunctionalNode {
 
         HttpResponse<Void> Response = client.send(request, HttpResponse.BodyHandlers.discarding());
         if(Response.statusCode() < 200 || Response.statusCode() > 300) {
-            n.log(ERROR, "Could not send telegram message: {}",Response.statusCode());
+            n.log(ERROR, "Could not send telegram message: {0}", Response.statusCode());
         }
     }
 
@@ -76,7 +76,7 @@ public final class TelegramNode implements FunctionalNode {
             try {
                 trySend(n, o.eval(message), id);
             } catch (IOException | InterruptedException e) {
-                n.log(ERROR, "Could not send message to {}: {}", id, e);
+                n.log(ERROR, "Could not send message to {0}: {1}", id, e);
             }
         }
     }

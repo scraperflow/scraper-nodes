@@ -5,6 +5,7 @@ plugins {
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -15,8 +16,9 @@ subprojects {
 
     afterEvaluate {
         dependencies {
-            providedCompile fileTree(dir: 'libs', include: '*.jar')
-            testImplementation fileTree(dir: 'libs', include: '*.jar')
+            providedCompile 'com.github.scraperflow.scraper:core:v0.16.4'
+            testImplementation 'com.github.scraperflow.scraper:application:v0.16.4'
+            testImplementation 'com.github.scraperflow.scraper:core-plugins:v0.16.4'
 
             testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
             testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.1'

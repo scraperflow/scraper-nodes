@@ -21,7 +21,7 @@ import java.io.File;
  */
 @NodePlugin("0.1.0")
 @Io
-public final class ParentOfFileNode implements FunctionalNode {
+public final class ParentOfFile implements FunctionalNode {
 
     /** Parent of a file. */
     @FlowKey(defaultValue = "\"parent\"")

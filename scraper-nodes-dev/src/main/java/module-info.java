@@ -1,5 +1,5 @@
 import scraper.api.node.type.Node;
-import scraper.nodes.dev.io.ReadFileNode;
+import scraper.nodes.dev.io.ReadFile;
 
 open module scraper.nodes.dev {
     requires scraper.core;
@@ -7,5 +7,5 @@ open module scraper.nodes.dev {
     requires org.jsoup;
 
     // FIXME why is this needed so that reflections can find all nodes?
-    provides Node with ReadFileNode;
+    provides Node with ReadFile;
 }

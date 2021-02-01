@@ -20,7 +20,7 @@ import java.util.List;
  */
 @NodePlugin("0.1.0")
 @Io
-public final class ListFilesNode implements StreamNode {
+public final class ListFiles implements StreamNode {
 
     /** List files of this directory */
     @FlowKey(defaultValue = "\"{file}\"")

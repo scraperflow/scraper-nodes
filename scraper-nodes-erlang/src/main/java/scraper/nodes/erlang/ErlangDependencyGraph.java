@@ -21,7 +21,7 @@ import java.util.Optional;
 /** Builds a graph out of static, dynamic, and supervisor module calls */
 @NodePlugin("0.1.0")
 @Io
-public final class ErlangDependencyGraphNode implements FunctionalNode {
+public final class ErlangDependencyGraph implements FunctionalNode {
 
     /** static */
     @FlowKey(defaultValue = "\"{static-mod-calls}\"")

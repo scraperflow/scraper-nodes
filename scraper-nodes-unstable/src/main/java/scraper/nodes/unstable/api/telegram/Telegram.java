@@ -30,7 +30,7 @@ import static scraper.api.node.container.NodeLogLevel.ERROR;
  */
 @NodePlugin("1.0.2")
 @Io
-public final class TelegramNode implements FunctionalNode {
+public final class Telegram implements FunctionalNode {
 
     /** Message as a String */
     @FlowKey(defaultValue = "\"{message}\"")

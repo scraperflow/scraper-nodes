@@ -2,9 +2,9 @@
 name: mapjoin
 graphs:
   start:
-    - { type: EchoNode, put: initial, value: 42 }
+    - { type: Echo , put: initial, value: 42 }
 
-    - type: SocketNode
+    - type: Socket
       # this is initial :: String because its separate from the forwarding
       expected: "{expect}"
       # both request and request2 should provide initial :: String
@@ -12,19 +12,19 @@ graphs:
         request: request
         request2: request2
 
-    # this has nothing to do with requests going off the socket node
+    # this has nothing to do with requests going off the socket
     # so {initial} :: Integer
-    - type: IntToStringNode
+    - type: IntToString
       integer: "{initial}"
       string: "_"
 
   request:
-    - type: EchoNode
+    - type: Echo
       put: expect
       value: "1"
 
   request2:
-    - type: IntToStringNode
+    - type: IntToString
       integer: "{initial}"
       string: "expet"
 

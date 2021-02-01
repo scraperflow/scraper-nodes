@@ -1,5 +1,5 @@
 import scraper.api.node.type.Node;
-import scraper.nodes.unstable.api.telegram.TelegramNode;
+import scraper.nodes.unstable.api.telegram.Telegram;
 
 open module scraper.nodes.unstable {
     requires scraper.core;
@@ -11,5 +11,5 @@ open module scraper.nodes.unstable {
     exports scraper.nodes.unstable.pass.dialog;
 
     // FIXME why is this needed so that reflections can find all nodes?
-    provides Node with TelegramNode;
+    provides Node with Telegram;
 }

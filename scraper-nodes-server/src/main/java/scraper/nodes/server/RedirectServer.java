@@ -24,10 +24,10 @@ import static scraper.api.node.container.NodeLogLevel.*;
 /**
  * Redirects urls to other urls.
  */
-@NodePlugin("0.1.0")
+@NodePlugin(value = "0.1.0", customFlowAfter = true)
 @Io
 @Stateful
-public final class RedirectServerNode implements FunctionalNode {
+public final class RedirectServer implements FunctionalNode {
 
     /** Port of the server */
     @FlowKey(defaultValue = "8081") @Argument

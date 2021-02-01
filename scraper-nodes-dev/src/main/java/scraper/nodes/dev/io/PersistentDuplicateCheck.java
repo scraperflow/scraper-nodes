@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 @NodePlugin("0.2.0")
 @Io
-public final class PersistentDuplicateCheckNode implements FunctionalNode {
+public final class PersistentDuplicateCheck implements FunctionalNode {
 
     /** File path to the store used to check duplicates */
     @FlowKey(mandatory = true) @EnsureFile

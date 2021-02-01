@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  */
 @NodePlugin("0.2.1")
 @Io
-public final class PathGlobFileNode implements StreamNode {
+public final class PathGlobFile implements StreamNode {
 
     /** Where the output file path will be put. */
     @FlowKey(defaultValue = "\"_\"")

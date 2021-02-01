@@ -21,7 +21,7 @@ import scraper.api.template.T;
  * Executes a css query on a html String.
  */
 @NodePlugin("0.3.0")
-public final class HtmlCssQueryNode implements StreamNode {
+public final class HtmlCssQuery implements StreamNode {
 
     /** Raw html String */
     @FlowKey(mandatory = true)

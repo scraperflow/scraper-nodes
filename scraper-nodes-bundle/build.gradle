@@ -17,7 +17,7 @@ extraJavaModuleInfo {
     }
 }
 
-version = '9'
+version = '10'
 
 
 dependencies {

@@ -23,7 +23,7 @@ import java.util.List;
  */
 @NodePlugin("0.1.0")
 @Io
-public final class ReadChunkFileNode implements StreamNode {
+public final class ReadChunkFile implements StreamNode {
 
     /** Input file path */
     @FlowKey(mandatory = true) @EnsureFile

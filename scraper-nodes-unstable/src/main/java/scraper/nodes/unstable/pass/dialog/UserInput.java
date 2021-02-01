@@ -21,7 +21,7 @@ import static scraper.api.node.container.NodeLogLevel.INFO;
  */
 @NodePlugin("0.3.0")
 @Io
-public final class UserInputNode implements FunctionalNode {
+public final class UserInput implements FunctionalNode {
 
     /** Which key to ensure */
     @FlowKey(mandatory = true)

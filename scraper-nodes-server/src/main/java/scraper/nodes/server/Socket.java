@@ -87,10 +87,10 @@ import static scraper.api.node.container.NodeLogLevel.*;
  *     <li>Marco Meides</li>
  * </ul>
  */
-@NodePlugin("0.8.0")
+@NodePlugin(value = "0.8.0", customFlowAfter = true, customFlowBefore = true)
 @Stateful
 @Io
-public final class SocketNode implements FunctionalNode {
+public final class Socket implements FunctionalNode {
 
     /** After the return of the forward call, the result object is expected at this key */
     @FlowKey
@@ -358,7 +358,7 @@ public final class SocketNode implements FunctionalNode {
 
     static class SocketHandler extends HttpServlet {
         private final NodeContainer<? extends Node> nodeC;
-        private final SocketNode node;
+        private final Socket node;
         private final Boolean queue;
         private final L<String> putBody;
 
@@ -366,7 +366,7 @@ public final class SocketNode implements FunctionalNode {
 
 
 
-        SocketHandler(NodeContainer<? extends Node> container, SocketNode node) {
+        SocketHandler(NodeContainer<? extends Node> container, Socket node) {
             this.nodeC = container;
             this.node = node;
             this.queue = node.queue;

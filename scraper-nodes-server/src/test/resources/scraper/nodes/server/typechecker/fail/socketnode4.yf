@@ -2,7 +2,7 @@
 name: socket
 graphs:
   start:
-    - type: SocketNode
+    - type: Socket
       expected: "{expect}"
       # expect can never be written
       hostMap:

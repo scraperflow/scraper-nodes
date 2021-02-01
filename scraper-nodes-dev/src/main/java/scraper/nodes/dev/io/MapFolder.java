@@ -21,7 +21,7 @@ import static scraper.api.node.container.NodeLogLevel.INFO;
 @NodePlugin("0.1.0")
 @Io
 @Stateful
-public final class MapFolderNode implements FunctionalNode {
+public final class MapFolder implements FunctionalNode {
 
     /** Folder to watch */
     @FlowKey(mandatory = true) @EnsureFile @Argument

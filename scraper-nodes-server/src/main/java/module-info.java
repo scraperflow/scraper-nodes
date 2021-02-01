@@ -1,5 +1,5 @@
 import scraper.api.node.type.Node;
-import scraper.nodes.server.SocketNode;
+import scraper.nodes.server.Socket;
 
 open module scraper.nodes.server {
     requires scraper.core;
@@ -17,5 +17,5 @@ open module scraper.nodes.server {
     requires org.eclipse.jetty.rewrite;
 
     // FIXME why is this needed so that reflections can find all nodes?
-    provides Node with SocketNode;
+    provides Node with Socket;
 }

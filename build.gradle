@@ -19,7 +19,13 @@ dependencies {
     implementation project(':scraper-nodes-experimental')
 }
 
-subprojects { 
+plugins.withType(JavaPlugin).configureEach {
+    java {
+        modularity.inferModulePath = true
+    }
+}
+
+subprojects {
     configurations {
         providedCompile
     }

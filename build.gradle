@@ -64,13 +64,13 @@ subprojects {
 apply from: 'gradle/jacoco-merge.gradle'
 
 // local install
-task install(type: Copy) { 
+task installLocal(type: Copy) {
     def homePath = System.properties['user.home']
     from("${buildDir}/install/scraper-nodes/lib")
     into("${homePath}/opt/lib/scraper/var")
     include('*.jar')
 }
-install.dependsOn(installDist);
+installLocal.dependsOn(installDist);
 
 
 task distribute(type: Zip) {

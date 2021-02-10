@@ -2,6 +2,20 @@ plugins {
     id 'jacoco'
     id 'java-library'
     id 'java-library-distribution'
+    id("de.jjohannes.extra-java-module-info") version "0.1"
+}
+
+extraJavaModuleInfo {
+    module("commons-logging-1.2.jar", "commons.logging", "1.2") {}
+    module("javax.servlet-api-3.1.0.jar", "javax.servlet.api", "3.1.0") {
+        exports "javax.servlet.http"
+        exports "javax.servlet"
+    }
+    module("jsoup-1.12.1.jar", "org.jsoup", "1.12.1") {
+        exports "org.jsoup"
+        exports "org.jsoup.nodes"
+        exports "org.jsoup.select"
+    }
 }
 
 allprojects {

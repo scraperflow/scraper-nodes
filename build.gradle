@@ -64,3 +64,12 @@ task install(type: Copy) {
     include('*.jar')
 }
 install.dependsOn(installDist);
+
+
+task distribute(type: Zip) {
+    archiveFileName = "bundle.zip"
+    destinationDirectory = file("$buildDir/dist")
+
+    from "$buildDir/install/scraper-nodes/lib"
+}
+distribute.dependsOn(installDist);

@@ -19,9 +19,9 @@ import java.util.List;
 
 /**
  * Reads an input file in chunks.
- * Splits after <var>splitAfterLines</var> many lines read.
+ * Splits after <var>splitAfterLines</var> many lines or after <var>splitAFterCharacters</var> characters read.
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.2.0")
 @Io
 public final class ReadChunkFile implements StreamNode {
 
@@ -38,8 +38,12 @@ public final class ReadChunkFile implements StreamNode {
     private String charset;
 
     /** Split after this many lines */
-    @FlowKey(defaultValue = "1000")
+    @FlowKey(defaultValue = "2000")
     private Integer splitAfterLines;
+
+    /** Split after this many characters */
+    @FlowKey(defaultValue = "100000")
+    private Integer splitAfterCharacters;
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) {
@@ -48,23 +52,24 @@ public final class ReadChunkFile implements StreamNode {
         try(BufferedReader reader = new BufferedReader(new FileReader(file, Charset.forName(charset)))) {
             StringBuilder splitContent = new StringBuilder();
 
-            int current = 1;
+            int currentLines = 1;
+            int currentChars = 1;
 
-            String line = reader.readLine();
 
-            while (line != null) {
-                splitContent.append(line).append("\n");
-                if (current > splitAfterLines) {
+            int c;
+            while ((c = reader.read()) != -1) {
+                splitContent.append(((char) c));
+                if ((currentLines > splitAfterLines) || (currentChars > splitAfterCharacters)) {
                     FlowMap out = o.copy();
                     out.output(output, splitContent.toString());
                     n.streamFlowMap(o, out);
                     splitContent = new StringBuilder();
-                    current = 0;
+                    currentLines = 0;
+                    currentChars = 0;
                 }
 
-                line = reader.readLine();
-
-                current++;
+                if(c == '\r' || c == '\n') { currentLines ++; }
+                currentChars ++;
             }
 
             if (splitContent.length() > 0) {

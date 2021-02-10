@@ -1,4 +1,4 @@
-package scraper.nodes.server;
+package scraper.nodes.experimental;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static scraper.api.node.container.NodeLogLevel.ERROR;
 
 

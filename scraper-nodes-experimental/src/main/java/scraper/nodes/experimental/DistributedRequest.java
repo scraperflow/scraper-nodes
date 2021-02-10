@@ -1,4 +1,4 @@
-package scraper.nodes.server;
+package scraper.nodes.experimental;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import scraper.annotations.NotNull;

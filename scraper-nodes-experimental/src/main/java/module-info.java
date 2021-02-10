@@ -1,8 +1,8 @@
 import scraper.api.node.type.Node;
-import scraper.nodes.server.Socket;
+import scraper.nodes.experimental.DistributedRequest;
 
-open module scraper.nodes.server {
-    requires scraper.api;
+open module scraper.nodes.experimental {
+    requires scraper.core;
 
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
@@ -17,5 +17,5 @@ open module scraper.nodes.server {
     requires org.eclipse.jetty.rewrite;
 
     // FIXME why is this needed so that reflections can find all nodes?
-    provides Node with Socket;
+    provides Node with DistributedRequest;
 }

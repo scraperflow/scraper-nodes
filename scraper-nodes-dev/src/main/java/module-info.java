@@ -2,7 +2,7 @@ import scraper.api.node.type.Node;
 import scraper.nodes.dev.io.ReadFile;
 
 open module scraper.nodes.dev {
-    requires scraper.core;
+    requires scraper.api;
 
     requires org.jsoup;
 

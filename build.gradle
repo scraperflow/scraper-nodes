@@ -1,5 +1,7 @@
 plugins {
     id 'jacoco'
+    id 'java-library'
+    id 'java-library-distribution'
 }
 
 allprojects {
@@ -9,6 +11,13 @@ allprojects {
     }
 }
 
+dependencies {
+    implementation project(':scraper-nodes-dev')
+    implementation project(':scraper-nodes-erlang')
+    implementation project(':scraper-nodes-server')
+    implementation project(':scraper-nodes-unstable')
+}
+
 subprojects { 
     configurations {
         providedCompile
@@ -16,8 +25,7 @@ subprojects {
 
     afterEvaluate {
         dependencies {
-            providedCompile 'com.github.scraperflow.scraper:core:v0.17.0'
-            testImplementation 'com.github.scraperflow.scraper:application:v0.17.0'
+            providedCompile 'com.github.scraperflow.albsch:core:v0.16.1'
             testImplementation 'com.github.scraperflow.scraper:core-plugins:v0.17.0'
 
             testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
@@ -45,3 +53,12 @@ subprojects {
 
 // merge coverage
 apply from: 'gradle/jacoco-merge.gradle'
+
+// local install
+task install(type: Copy) { 
+    def homePath = System.properties['user.home']
+    from("${buildDir}/install/scraper-nodes/lib")
+    into("${homePath}/opt/lib/scraper/var")
+    include('*.jar')
+}
+install.dependsOn(installDist);

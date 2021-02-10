@@ -16,6 +16,7 @@ dependencies {
     implementation project(':scraper-nodes-erlang')
     implementation project(':scraper-nodes-server')
     implementation project(':scraper-nodes-unstable')
+    implementation project(':scraper-nodes-experimental')
 }
 
 subprojects { 

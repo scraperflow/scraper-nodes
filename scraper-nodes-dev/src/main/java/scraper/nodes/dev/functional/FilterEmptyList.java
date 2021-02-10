@@ -2,6 +2,7 @@ package scraper.nodes.dev.functional;
 
 import scraper.annotations.node.FlowKey;
 import scraper.annotations.node.NodePlugin;
+import scraper.api.exceptions.BreakException;
 import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.NodeContainer;
@@ -23,8 +24,8 @@ public final class FilterEmptyList<A> implements Node {
     @Override
     public FlowMap process(NodeContainer<? extends Node> n, FlowMap o) throws NodeException {
         List<A> list = o.eval(this.list);
-        if(!list.isEmpty()) return n.forward(o);
-        else throw new BreakException();
+        if(!list.isEmpty()) return o;
+        else throw new BreakException("Empty list");
     }
 
 }

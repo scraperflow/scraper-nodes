@@ -4,7 +4,7 @@ plugins {
     id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
-version = '0.4.0'
+version = '0.1.0'
 
 extraJavaModuleInfo {
     module("commons-logging-1.2.jar", "commons.logging", "1.2") {}
@@ -15,10 +15,8 @@ extraJavaModuleInfo {
 }
 
 dependencies {
-
-    // jackson is part of scraper's main dependencies
-    providedCompile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.+'
-    providedCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
+    // core
+    providedCompile 'com.github.scraperflow.scraper:core:v0.17.1'
 
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'

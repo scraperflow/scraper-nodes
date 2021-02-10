@@ -5,3 +5,8 @@ plugins {
 
 version = '0.3.0'
 
+
+dependencies {
+    // core
+    providedCompile 'com.github.scraperflow.scraper:core:v0.17.1'
+}

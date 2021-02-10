@@ -4,3 +4,8 @@ plugins {
 }
 
 version = '0.2.0'
+
+dependencies {
+    // template utilities
+    providedCompile 'com.github.scraperflow.scraper:core:v0.17.1'
+}

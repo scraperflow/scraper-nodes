@@ -20,7 +20,7 @@ import scraper.api.template.T;
 /**
  * Executes a css query on a html String.
  */
-@NodePlugin("0.3.0")
+@NodePlugin("0.4.0")
 public final class HtmlCssQuery implements StreamNode {
 
     /** Raw html String */
@@ -73,6 +73,9 @@ public final class HtmlCssQuery implements StreamNode {
                 case ATTR:
                     copy.output(put, element.attr(attr));
                     break;
+                case OUTERHTML:
+                    copy.output(put, element.outerHtml());
+                    break;
             }
 
             n.streamFlowMap(o, copy);
@@ -82,5 +85,5 @@ public final class HtmlCssQuery implements StreamNode {
     }
 
 
-    enum ElementOutput { TEXT, HTML, ATTR }
+    enum ElementOutput { TEXT, HTML, ATTR, OUTERHTML }
 }

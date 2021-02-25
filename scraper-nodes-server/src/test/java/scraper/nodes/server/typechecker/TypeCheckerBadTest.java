@@ -35,7 +35,7 @@ public class TypeCheckerBadTest {
         Assertions.assertThrows(TemplateException.class, () -> {
             TypeChecker t = new TypeChecker();
             ScrapeInstance spec = read(path);
-            ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec, true);
+            ControlFlowGraph cfg = FlowUtil.generateControlFlowGraph(spec);
             t.typeTaskflow(spec, cfg);
         });
     }

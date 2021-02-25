@@ -16,7 +16,7 @@ extraJavaModuleInfo {
 
 dependencies {
     // core
-    providedCompile 'com.github.scraperflow.scraper:core:v0.17.1'
+    providedCompile 'com.github.scraperflow.scraper:core:v0.17.3'
 
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.26.v20200117'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.26.v20200117'

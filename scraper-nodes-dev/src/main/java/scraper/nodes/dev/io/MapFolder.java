@@ -1,24 +1,19 @@
 package scraper.nodes.dev.io;
 
-import scraper.annotations.NotNull;
-import scraper.annotations.node.*;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.Address;
-import scraper.api.node.container.FunctionalNodeContainer;
-import scraper.api.node.type.FunctionalNode;
-import scraper.api.template.L;
+import scraper.annotations.*;
+import scraper.api.*;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import static scraper.api.node.container.NodeLogLevel.ERROR;
-import static scraper.api.node.container.NodeLogLevel.INFO;
+import static scraper.api.NodeLogLevel.ERROR;
+import static scraper.api.NodeLogLevel.INFO;
 
 /**
  * Map function for each file, async refill of tasks
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.2.0")
 @Io
 @Stateful
 public final class MapFolder implements FunctionalNode {
@@ -27,14 +22,15 @@ public final class MapFolder implements FunctionalNode {
     @FlowKey(mandatory = true) @EnsureFile @Argument
     private String folder;
 
+    /** Target for each file */
+    @FlowKey(mandatory = true)
+    @Flow(label = "map")
+    private Address fileTarget;
+
     /** File name */
     @FlowKey
     private final L<String> putFileName = new L<>(){};
 
-    /** Target for each file */
-    @FlowKey(mandatory = true)
-    @Flow(dependent = false, crossed = true, label = "map")
-    private Address fileTarget;
 
     Thread watcher;
     boolean refresh = true;
@@ -72,7 +68,7 @@ public final class MapFolder implements FunctionalNode {
                         toProcess.forEach(newFile -> {
                             FlowMap copy = o.copy();
                             copy.output(putFileName, newFile.getName());
-                            n.forkDispatch(copy, fileTarget);
+                            n.forward(copy, fileTarget);
                         });
                         processed.addAll(toProcess);
                         toProcess.clear();

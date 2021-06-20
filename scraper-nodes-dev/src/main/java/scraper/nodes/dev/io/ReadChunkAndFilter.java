@@ -1,22 +1,12 @@
 package scraper.nodes.dev.io;
 
-import scraper.annotations.NotNull;
-import scraper.annotations.node.EnsureFile;
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.Io;
-import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.container.StreamNodeContainer;
-import scraper.api.node.type.StreamNode;
-import scraper.api.template.L;
-import scraper.api.template.T;
+import scraper.annotations.*;
+import scraper.api.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 
 /**
  * Reads an input file in chunks.
@@ -32,12 +22,8 @@ public final class ReadChunkAndFilter implements StreamNode {
     @FlowKey(mandatory = true) @EnsureFile
     private final T<String> inputFile = new T<>(){};
 
-    /** Where the output line will be put */
-    @FlowKey(defaultValue = "\"output\"")
-    private final L<String> output = new L<>(){};
-
     /** Charset of the file */
-    @FlowKey(defaultValue = "\"ISO_8859_1\"")
+    @FlowKey(defaultValue = "\"UTF-8\"")
     private String charset;
 
     /** Line contains filter check */
@@ -47,6 +33,10 @@ public final class ReadChunkAndFilter implements StreamNode {
     /** How many lines after the matching line to include */
     @FlowKey
     private Integer includeAfterMatch;
+
+    /** Where the output line will be put */
+    @FlowKey(mandatory = true)
+    private final L<String> output = new L<>(){};
 
     @Override
     public void process(@NotNull StreamNodeContainer n, @NotNull FlowMap o) throws NodeException {

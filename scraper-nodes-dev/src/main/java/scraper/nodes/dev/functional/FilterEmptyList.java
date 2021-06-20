@@ -1,13 +1,7 @@
 package scraper.nodes.dev.functional;
 
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.BreakException;
-import scraper.api.exceptions.NodeException;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.container.NodeContainer;
-import scraper.api.node.type.Node;
-import scraper.api.template.T;
+import scraper.annotations.*;
+import scraper.api.*;
 
 import java.util.List;
 
@@ -22,10 +16,9 @@ public final class FilterEmptyList<A> implements Node {
     private final T<List<A>> list = new T<>(){};
 
     @Override
-    public FlowMap process(NodeContainer<? extends Node> n, FlowMap o) throws NodeException {
+    public void process(NodeContainer<? extends Node> n, FlowMap o) {
         List<A> list = o.eval(this.list);
-        if(!list.isEmpty()) return o;
-        else throw new BreakException("Empty list");
+        if(list.isEmpty()) throw new NodeException("Empty List");
     }
 
 }

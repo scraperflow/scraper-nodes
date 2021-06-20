@@ -1,14 +1,7 @@
 package scraper.nodes.dev.io;
 
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.Io;
-import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.container.FunctionalNodeContainer;
-import scraper.api.node.type.FunctionalNode;
-import scraper.api.template.L;
-import scraper.api.template.T;
+import scraper.annotations.*;
+import scraper.api.*;
 
 import java.io.File;
 
@@ -19,17 +12,17 @@ import java.io.File;
  * type: ParentOfFileNode
  * </pre>
  */
-@NodePlugin("0.1.0")
+@NodePlugin("0.2.0")
 @Io
 public final class ParentOfFile implements FunctionalNode {
 
-    /** Parent of a file. */
-    @FlowKey(defaultValue = "\"parent\"")
-    private final L<String> output = new L<>(){};
-
     /** path to get the parent. */
-    @FlowKey(defaultValue = "\"{path}\"")
+    @FlowKey(mandatory = true)
     private final T<String> path = new T<>(){};
+
+    /** Parent of a file. */
+    @FlowKey(mandatory = true)
+    private final L<String> output = new L<>(){};
 
     @Override
     public void modify(FunctionalNodeContainer n, FlowMap o) throws NodeException {

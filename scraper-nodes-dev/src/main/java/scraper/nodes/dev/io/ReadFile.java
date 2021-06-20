@@ -1,15 +1,7 @@
 package scraper.nodes.dev.io;
 
-import scraper.annotations.NotNull;
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.Io;
-import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.NodeException;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.container.FunctionalNodeContainer;
-import scraper.api.node.type.FunctionalNode;
-import scraper.api.template.L;
-import scraper.api.template.T;
+import scraper.annotations.*;
+import scraper.api.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,17 +24,17 @@ public final class ReadFile implements FunctionalNode {
     @FlowKey(mandatory = true)
     private final T<String> inputFile = new T<>(){};
 
-    /** Where the output line will be put */
-    @FlowKey(defaultValue = "\"output\"")
-    private final L<String> output = new L<>(){};
-
     /** Character encoding of the file */
-    @FlowKey(defaultValue = "\"ISO_8859_1\"")
+    @FlowKey(defaultValue = "\"UTF-8\"")
     private String charset;
 
     /** Join lines with this string. Can be empty. */
     @FlowKey(defaultValue = "\"\\n\"")
     private String join;
+
+    /** Where the output line will be put */
+    @FlowKey(mandatory = true)
+    private final L<String> output = new L<>(){};
 
     public void modify(@NotNull final FunctionalNodeContainer n, @NotNull final FlowMap o) throws NodeException {
         String file = o.eval(inputFile);

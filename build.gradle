@@ -27,10 +27,10 @@ allprojects {
 
 dependencies {
     implementation project(':scraper-nodes-dev')
-    implementation project(':scraper-nodes-erlang')
-    implementation project(':scraper-nodes-server')
-    implementation project(':scraper-nodes-unstable')
-    implementation project(':scraper-nodes-experimental')
+//    implementation project(':scraper-nodes-erlang')
+//    implementation project(':scraper-nodes-server')
+//    implementation project(':scraper-nodes-unstable')
+//    implementation project(':scraper-nodes-experimental')
 }
 
 plugins.withType(JavaPlugin).configureEach {
@@ -39,17 +39,15 @@ plugins.withType(JavaPlugin).configureEach {
     }
 }
 
-subprojects {
+
+configure(subprojects.findAll {it.name != 'api'}) {
     configurations {
         providedCompile
     }
 
     afterEvaluate {
         dependencies {
-            providedCompile 'com.github.scraperflow.scraper:api:v0.17.3'
-
-            testImplementation 'com.github.scraperflow.scraper:core:v0.17.3'
-            testImplementation 'com.github.scraperflow.scraper:core-plugins:v0.17.3'
+            providedCompile project(':api')
 
             testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
             testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.1'
@@ -68,7 +66,7 @@ subprojects {
             modularity.inferModulePath = true
         }
     }
-    
+
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
     }

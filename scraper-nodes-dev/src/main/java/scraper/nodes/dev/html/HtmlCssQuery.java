@@ -1,35 +1,22 @@
 package scraper.nodes.dev.html;
 
+import scraper.annotations.*;
+import scraper.api.*;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import scraper.annotations.NotNull;
-import scraper.annotations.node.FlowKey;
-import scraper.annotations.node.NodePlugin;
-import scraper.api.exceptions.ValidationException;
-import scraper.api.flow.FlowMap;
-import scraper.api.node.container.NodeContainer;
-import scraper.api.node.container.StreamNodeContainer;
-import scraper.api.node.type.Node;
-import scraper.api.node.type.StreamNode;
-import scraper.api.specification.ScrapeInstance;
-import scraper.api.template.L;
-import scraper.api.template.T;
 
 /**
  * Executes a css query on a html String.
  */
-@NodePlugin("0.4.0")
+@NodePlugin("0.5.0")
 public final class HtmlCssQuery implements StreamNode {
 
     /** Raw html String */
     @FlowKey(mandatory = true)
     private final T<String> html = new T<>(){};
-
-    /** Puts the parsed element as text to this key */
-    @FlowKey(defaultValue = "\"result\"")
-    private final L<String> put = new L<>(){};
 
     /** Css Query for selecting elements */
     @FlowKey(mandatory = true)
@@ -46,6 +33,10 @@ public final class HtmlCssQuery implements StreamNode {
     /** If ATTR is enabled, fetches that attribute for every element */
     @FlowKey
     private String attr;
+
+    /** Puts the parsed element as text to this key */
+    @FlowKey(mandatory = true)
+    private final L<String> put = new L<>(){};
 
     @Override
     public void init(NodeContainer<? extends Node> n, ScrapeInstance instance) throws ValidationException {

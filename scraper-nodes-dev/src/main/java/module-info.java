@@ -1,5 +1,5 @@
-import scraper.api.node.type.Node;
 import scraper.nodes.dev.io.ReadFile;
+import scraper.api.Node;
 
 open module scraper.nodes.dev {
     requires scraper.api;
